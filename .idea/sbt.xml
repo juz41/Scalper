@@ -11,8 +11,9 @@
             <option value="$PROJECT_DIR$/project" />
           </set>
         </option>
+        <option name="preferScala2" value="false" />
         <option name="sbtVersion" value="1.12.5" />
-        <option name="separateProdAndTestSourcesIsExplicit" value="true" />
+        <option name="useSbtShellForBuild" value="true" />
       </SbtProjectSettings>
     </option>
   </component>

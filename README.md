@@ -1,4 +1,4 @@
-# poker-scala
+# Scalper
 
 A Scala implementation of Poker built on Play Framework.  
 This project aims to create a web app that allows users to play poker.

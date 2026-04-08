@@ -28,8 +28,6 @@ This project aims to create a web app that allows users to play poker.
 
 ## Possible additional features
 
----
-
 - different poker variations
 - account, leaderboard, social features
 - game history features (best hand, statistics)

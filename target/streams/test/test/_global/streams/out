@@ -1,0 +1,86 @@
+[0m[[0m[0mdebug[0m] [0m[0mjavaOptions: Vector()[0m
+[0m[[0m[0mdebug[0m] [0m[0mForking tests - parallelism = false[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreate a single-thread test executor[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunner for org.scalatest.tools.Framework produced 3 initial tasks for 3 tests.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(logic.HandEvaluatorSpec, sbt.ForkMain$SubclassFingerscan@61832929, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHandEvaluatorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHandEvaluator.evaluate[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given a Royal Flush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return RoyalFlush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given a Straight Flush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return StraightFlush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given Four of a Kind[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return FourOfAKind[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given a Full House[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return FullHouse[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given a Flush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return Flush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given a Straight[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return Straight[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should recognise the wheel (A-2-3-4-5) as a Straight[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given Three of a Kind[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return ThreeOfAKind[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given Two Pair[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return TwoPair[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given One Pair[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return OnePair[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given High Card[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return HighCard[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when given wrong card count[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should throw IllegalArgumentException[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHandEvaluator.bestFiveFrom[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should find a flush from 7 cards when one exists[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should find a straight from 7 cards[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should prefer a stronger hand over a weaker subset[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw when fewer than 5 cards are provided[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHandRank ordering[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should rank StraightFlush above Flush[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should rank FullHouse above Straight[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should rank all hands in the correct ascending order[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHandEvaluator.determineWinner[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the player with the stronger hand[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return both players on an exact tie[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should use kicker to break a tie[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 22 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(model.CardSpec, sbt.ForkMain$SubclassFingerscan@29774679, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCardSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSuit[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should contain exactly 4 suits[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have distinct symbols[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mRank[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should contain exactly 13 ranks[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have Two as the lowest rank[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have Ace as the highest rank[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have strictly increasing values[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCard[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should produce a compact string representation[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should support value equality[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should not equal a card with a different rank[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should not equal a card with a different suit[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 10 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(model.DeckSpec, sbt.ForkMain$SubclassFingerscan@3ffc5af1, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDeckSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDeck.standard[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should contain exactly 52 cards[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should contain 52 unique cards[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should contain every rank–suit combination[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDeck.shuffle[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should keep the same number of cards[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should keep the same set of cards (just reordered)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDeck.deal[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the requested number of cards[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should remove the dealt cards from the remaining deck[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should not include dealt cards in the remaining deck[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should deal cards in order (top of deck first)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw IllegalArgumentException when dealing more than available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should allow dealing the entire deck[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 11 events.[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mRun completed in 2 seconds, 639 milliseconds.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTotal number of tests run: 43[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mSuites: completed 3, aborted 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTests: succeeded 43, failed 0, canceled 0, ignored 0, pending 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAll tests passed.[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	model.DeckSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	model.CardSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	logic.HandEvaluatorSpec[0m

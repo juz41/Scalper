@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: javax.inject:javax.inject:1:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="javax.inject" artifactId="javax.inject" version="1" baseVersion="1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/javax/inject/javax.inject/1/javax.inject-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

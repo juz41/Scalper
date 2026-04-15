@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.typesafe.play:play-server_2.13:2.9.4:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.typesafe.play" artifactId="play-server_2.13" version="2.9.4" baseVersion="2.9.4" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-server_2.13/2.9.4/play-server_2.13-2.9.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-server_2.13/2.9.4/play-server_2.13-2.9.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

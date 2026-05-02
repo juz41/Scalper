@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Scalper UI</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #app { width: 100%; max-width: 900px; }
+        .table { background: radial-gradient(circle, #2e7d32 0%, #1b5e20 100%); border: 15px solid #3e2723; border-radius: 200px; padding: 50px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; }
+        .pot { font-size: 24px; font-weight: bold; color: #ffd700; margin-bottom: 20px; text-shadow: 1px 1px 2px black; }
+        .cards { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .card { background: white; border-radius: 8px; width: 60px; height: 90px; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .card-back { background: repeating-linear-gradient(45deg, #b71c1c, #b71c1c 10px, #c62828 10px, #c62828 20px); border: 2px solid white; }
+        .players { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 50px; }
+        .player h3 { margin: 0 0 10px 0; font-size: 18px; text-shadow: 1px 1px 2px black; }
+        .actions { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+        .btn:hover { transform: scale(1.05); }
+        .btn-fold { background: #d32f2f; color: white; }
+        .btn-call { background: #1976d2; color: white; }
+        .btn-raise { background: #fbc02d; color: black; }
+    </style>
+</head>
+<body>
+<div id="app">Ładowanie stołu pokerowego...</div>
+<!-- Ten plik wygeneruje Scala.js -->
+<script src="./target/scala-3.3.3/scalper-fastopt/main.js"></script>
+</body>
+</html>

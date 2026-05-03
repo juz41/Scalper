@@ -3,7 +3,6 @@ package network
 import engine._
 import model._
 import logic.HandEvaluator
-
 import scala.annotation.tailrec
 
 object NetworkGame {
@@ -12,64 +11,90 @@ object NetworkGame {
   private val SmallBlind    = 10
   private val BigBlind      = 20
 
-  def start(io: GameIO, clientsMap: Map[String, String]): Unit = {
-    io.broadcast("=== Texas Hold'em Multiplayer ===")
-    io.broadcast("Akcje: f = fold  |  c = call/check  |  r <kwota> = raise\n")
+  def start(sessionCode: String, session: GameSession): Unit = {
+    val io = new SessionIO(sessionCode)
 
-    val clientIds = clientsMap.keys.toList
+    var clientMap = Map.empty[String, String]
+    var initialPlayers = List.empty[Player]
 
-    val humans = clientIds.zipWithIndex.map { case (cid, i) =>
-      Player(s"${clientsMap(cid)} (${i+1})", StartingChips, Hand.empty, PlayerType.Human)
+    session.clients.forEach { (cid, name) =>
+      initialPlayers = initialPlayers :+ Player(name, StartingChips, Hand.empty, PlayerType.Human)
+      clientMap = clientMap + (name -> cid)
     }
 
-    // Mapowanie nazwy gracza z powrotem na ClientId, żebyśmy wiedzieli do kogo wysłać pytanie
-    val playerToClientMap = humans.map(h => h.name -> clientIds(humans.indexOf(h))).toMap
-
-    val botsStr = io.ask(clientIds.head, "Ilu botow (AI) dodac do gry? (0+)")
-    val numAIs = botsStr.toIntOption.getOrElse(0)
-
-    val ais = (1 to numAIs).map { i =>
-      Player(s"Bot $i", StartingChips, Hand.empty, PlayerType.Computer)
+    // Boty startowe (jeśli ktoś kliknął /bot w poczekalni)
+    val initialBotsCount = session.pendingBots.getAndSet(0)
+    val initialBots = (1 to initialBotsCount).map { i =>
+      Player(s"Bot ${System.currentTimeMillis() % 10000}_$i", StartingChips, Hand.empty, PlayerType.Computer)
     }.toList
 
-    val players = humans ++ ais
-    io.broadcast(s"\nStart gry z: ${players.map(_.name).mkString(", ")}")
-
-    gameLoop(io, playerToClientMap, players, dealerIndex = 0, round = 1)
+    gameLoop(io, session, clientMap, initialPlayers ++ initialBots, dealerIndex = 0, round = 1)
   }
 
   @tailrec
-  private def gameLoop(io: GameIO, cmap: Map[String, String], players: List[Player], dealerIndex: Int, round: Int): Unit = {
-    val active = players.filter(_.chips > 0)
+  private def gameLoop(
+                        io: GameIO,
+                        session: GameSession,
+                        cmap: Map[String, String],
+                        currentPlayers: List[Player],
+                        dealerIndex: Int,
+                        round: Int
+                      ): Unit = {
+    if (session.isDead) return
+
+    // Dodanie nowych botów oczekujących w kolejce
+    val newBotsCount = session.pendingBots.getAndSet(0)
+    val bots = (1 to newBotsCount).map { i =>
+      Player(s"Bot ${System.currentTimeMillis() % 10000}_$i", StartingChips, Hand.empty, PlayerType.Computer)
+    }.toList
+
+    // Dodanie spóźnionych ludzkich graczy
+    var humans = List.empty[Player]
+    var updatedCmap = cmap
+    while (!session.pendingPlayers.isEmpty) {
+      val (cid, name) = session.pendingPlayers.poll()
+      humans = humans :+ Player(name, StartingChips, Hand.empty, PlayerType.Human)
+      updatedCmap = updatedCmap + (name -> cid)
+    }
+
+    val players = currentPlayers ++ bots ++ humans
+    val active = players.filter(p => p.chips > 0 && isPlayerConnected(p, session, updatedCmap))
+
     if (active.size < 2) {
-      if (active.size == 1) io.broadcast(s"\n${active.head.name} wygrywa cala gre!")
-      else io.broadcast("\nBrak graczy z zetonami.")
+      if (active.size == 1) io.broadcast(s"\n${active.head.name} wygrywa grę (brak aktywnych przeciwników)!")
+      else io.broadcast("\nBrak graczy zdolnych do dalszej gry.")
+      session.isPlaying.set(false)
       return
     }
 
     io.broadcast(s"\n─── Runda $round ───  Dealer: ${players(dealerIndex % players.size).name}")
-    players.foreach(p => io.broadcast(s"  ${p.name}: ${p.chips} zetonow"))
+    players.foreach { p =>
+      val status = if(!isPlayerConnected(p, session, updatedCmap)) " (Odłączony)" else ""
+      io.broadcast(s"  ${p.name}: ${p.chips} żetonów$status")
+    }
 
-    io.broadcast("[Oczekiwanie 3 sekundy...]")
+    io.broadcast("[Za 3 sekundy gramy... Ostatnia szansa na /bot!]")
     Thread.sleep(3000)
 
-    val updatedPlayers = playRound(io, cmap, players, dealerIndex % players.size)
+    val updatedPlayers = playRound(io, session, updatedCmap, players, dealerIndex % players.size)
+    if (session.isDead) return
 
-    val again = io.ask(cmap(updatedPlayers.head.name), "\nCzy zagrać kolejną rundę? (y / n)")
-    if (again.equalsIgnoreCase("y")) {
-      val nextDealer = nextActiveIndex(updatedPlayers, dealerIndex, updatedPlayers.size)
-      gameLoop(io, cmap, updatedPlayers, nextDealer, round + 1)
-    } else {
-      io.broadcast("Dzięki za grę!")
-    }
+    val nextDealer = nextActiveIndex(updatedPlayers, session, updatedCmap, dealerIndex, updatedPlayers.size)
+    gameLoop(io, session, updatedCmap, updatedPlayers, nextDealer, round + 1)
   }
 
-  private def nextActiveIndex(players: List[Player], current: Int, n: Int): Int = {
+  private def isPlayerConnected(p: Player, session: GameSession, cmap: Map[String, String]): Boolean = {
+    if (p.playerType == PlayerType.Computer) true
+    else cmap.get(p.name).exists(cid => session.clients.containsKey(cid))
+  }
+
+  private def nextActiveIndex(players: List[Player], session: GameSession, cmap: Map[String, String], current: Int, n: Int): Int = {
     val next = (current + 1) % n
-    if (players(next).chips > 0) next else nextActiveIndex(players, next, n)
+    if (players(next).chips > 0 && isPlayerConnected(players(next), session, cmap)) next
+    else nextActiveIndex(players, session, cmap, next, n)
   }
 
-  private def playRound(io: GameIO, cmap: Map[String, String], allPlayers: List[Player], dealerIdx: Int): List[Player] = {
+  private def playRound(io: GameIO, session: GameSession, cmap: Map[String, String], allPlayers: List[Player], dealerIdx: Int): List[Player] = {
     val n = allPlayers.size
     val freshPlayers = allPlayers.map(p => if (p.folded) p.copy(folded = false) else p)
     val seatOrder = (0 until n).toList
@@ -107,14 +132,14 @@ object NetworkGame {
       } else p
     }
 
-    showHoleCards(io, cmap, players, eligibleSeats)
+    showHoleCards(io, session, cmap, players, eligibleSeats)
 
     val utg = (eligibleSeats.indexOf(bbSeat) + 1) % eligibleSeats.size
     var history = List.empty[ActionRecord]
     val seatPositions = calculatePositions(eligibleSeats, dealerIdx)
 
     // Pre-flop
-    val (ps1, pot1, history1, ended1) = bettingRound(io, cmap, players, eligibleSeats, pot, BigBlind, initialBets.clone(), utg, Nil, Street.PreFlop, history, seatPositions)
+    val (ps1, pot1, history1, ended1) = bettingRound(io, session, cmap, players, eligibleSeats, pot, BigBlind, initialBets.clone(), utg, Nil, Street.PreFlop, history, seatPositions)
     players = ps1; pot = pot1; history = history1
     if (ended1 || activePlayers(players, eligibleSeats).size == 1) return awardPot(io, players, pot, eligibleSeats)
 
@@ -122,9 +147,9 @@ object NetworkGame {
     val (flop, d2) = deck.deal(3); deck = d2
     val community1 = flop
     io.broadcast(s"\n── Flop ──  Stol: ${showCards(community1)}")
-    showHoleCards(io, cmap, players, eligibleSeats)
+    showHoleCards(io, session, cmap, players, eligibleSeats)
 
-    val (ps2, pot2, history2, ended2) = bettingRound(io, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community1, Street.Flop, history, seatPositions)
+    val (ps2, pot2, history2, ended2) = bettingRound(io, session, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community1, Street.Flop, history, seatPositions)
     players = ps2; pot = pot2; history = history2
     if (ended2 || activePlayers(players, eligibleSeats).size == 1) return awardPot(io, players, pot, eligibleSeats)
 
@@ -132,9 +157,9 @@ object NetworkGame {
     val (turn, d3) = deck.deal(1); deck = d3
     val community2 = community1 ++ turn
     io.broadcast(s"\n── Turn ──  Stol: ${showCards(community2)}")
-    showHoleCards(io, cmap, players, eligibleSeats)
+    showHoleCards(io, session, cmap, players, eligibleSeats)
 
-    val (ps3, pot3, history3, ended3) = bettingRound(io, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community2, Street.Turn, history, seatPositions)
+    val (ps3, pot3, history3, ended3) = bettingRound(io, session, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community2, Street.Turn, history, seatPositions)
     players = ps3; pot = pot3; history = history3
     if (ended3 || activePlayers(players, eligibleSeats).size == 1) return awardPot(io, players, pot, eligibleSeats)
 
@@ -142,20 +167,19 @@ object NetworkGame {
     val (river, _) = deck.deal(1)
     val community3 = community2 ++ river
     io.broadcast(s"\n── River ── Stol: ${showCards(community3)}")
-    showHoleCards(io, cmap, players, eligibleSeats)
+    showHoleCards(io, session, cmap, players, eligibleSeats)
 
-    val (ps4, pot4, _, ended4) = bettingRound(io, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community3, Street.River, history, seatPositions)
+    val (ps4, pot4, _, ended4) = bettingRound(io, session, cmap, players, eligibleSeats, pot, 0, Array.fill(n)(0), 0, community3, Street.River, history, seatPositions)
     players = ps4; pot = pot4
     if (ended4 || activePlayers(players, eligibleSeats).size == 1) return awardPot(io, players, pot, eligibleSeats)
 
-    // Showdown
     showdown(io, players, eligibleSeats, pot4, community3)
   }
 
   private def activePlayers(players: List[Player], eligibleSeats: List[Int]): List[Int] =
     eligibleSeats.filter(i => !players(i).folded)
 
-  private def bettingRound(io: GameIO, cmap: Map[String, String], players: List[Player], eligibleSeats: List[Int], pot: Int, currentBet: Int, streetBets: Array[Int], firstActIdx: Int, community: List[model.Card], street: Street, history: List[ActionRecord], seatPositions: Map[Int, String]): (List[Player], Int, List[ActionRecord], Boolean) = {
+  private def bettingRound(io: GameIO, session: GameSession, cmap: Map[String, String], players: List[Player], eligibleSeats: List[Int], pot: Int, currentBet: Int, streetBets: Array[Int], firstActIdx: Int, community: List[model.Card], street: Street, history: List[ActionRecord], seatPositions: Map[Int, String]): (List[Player], Int, List[ActionRecord], Boolean) = {
     io.broadcast(s"\n── Licytacja: $street ──")
     var ps = players
     var currentBetV = currentBet
@@ -170,6 +194,8 @@ object NetworkGame {
     var keepGoing = true
 
     while (keepGoing) {
+      if (session.isDead) return (ps, potV, historyV, true)
+
       val seatI = eligibleSeats(actionIdx % numSeats)
       val player = ps(seatI)
 
@@ -178,11 +204,17 @@ object NetworkGame {
 
         val action = player.playerType match {
           case PlayerType.Human =>
-            humanAction(io, cmap(player.name), player, pot = potV, toCall = toCall, community)
+            cmap.get(player.name) match {
+              case Some(cid) if session.clients.containsKey(cid) =>
+                humanAction(io, cid, player, potV, toCall, community)
+              case _ =>
+                io.broadcast(s"[$player.name] utracił połączenie. Automatyczny Fold.")
+                Action.Fold
+            }
           case PlayerType.Computer =>
             val ctx = GameContext(street, community, player.hand, potV, toCall, player.chips, currentBetV, activePlayers(ps, eligibleSeats).size, activePlayers(ps, eligibleSeats).filterNot(i => ps(i).name == player.name).map(i => ps(i).name -> ps(i).chips), seatPositions.getOrElse(seatI, "Unknown"), activePlayers(ps, eligibleSeats).filterNot(i => ps(i).name == player.name).map(i => ps(i).name -> seatPositions.getOrElse(i, "Unknown")).toMap, historyV)
             val a = ComputerAI.decideAction(ctx)
-            io.broadcast(s"${player.name} (${ctx.position}) mysli...  -> $a")
+            io.broadcast(s"${player.name} (${ctx.position}) myśli...  -> $a")
             Thread.sleep(1500)
             a
         }
@@ -190,7 +222,7 @@ object NetworkGame {
         val resolvedAction = action match {
           case Action.Fold =>
             ps = ps.updated(seatI, player.fold)
-            io.broadcast(s"${player.name} pasuje (fold).")
+            if(player.playerType == PlayerType.Human) io.broadcast(s"${player.name} pasuje (fold).")
             Action.Fold
           case Action.Call =>
             if (toCall == 0) {
@@ -238,19 +270,26 @@ object NetworkGame {
     val prompt = s"[Twoj ruch] zetonow:${player.chips}  pula:$pot  do_sprawdzenia:$toCall  |  fold(f)  $callWord$raiseOpt"
 
     @tailrec def readAction(): Action = {
-      io.ask(clientId, prompt).toLowerCase match {
-        case "f" => Action.Fold
-        case "c" => Action.Call
-        case s if s.startsWith("r ") =>
-          val extra = s.drop(2).toIntOption.getOrElse(0)
-          if (extra > toCall && extra <= player.chips) Action.Raise(extra)
-          else {
-            io.send(clientId, s"Bledne podbicie. Dodaj wartosc od ${toCall + 1} do ${player.chips}")
+      val rawInput = io.ask(clientId, prompt).toLowerCase
+      // Użytkownik mógł wpisać komendę /bot albo /wyjdz w trakcie proszenia o ruch
+      if (rawInput.startsWith("/")) {
+        io.send(clientId, "Komendy w trakcie ruchu ignorowane przez silnik (wpisz f, c lub r). Zostały przetworzone przez Lobby.")
+        readAction()
+      } else {
+        rawInput match {
+          case "f" => Action.Fold
+          case "c" => Action.Call
+          case s if s.startsWith("r ") =>
+            val extra = s.drop(2).toIntOption.getOrElse(0)
+            if (extra > toCall && extra <= player.chips) Action.Raise(extra)
+            else {
+              io.send(clientId, s"Bledne podbicie. Dodaj wartosc od ${toCall + 1} do ${player.chips}")
+              readAction()
+            }
+          case _ =>
+            io.send(clientId, "Nieznana akcja. Uzyj: f / c / r <ilosc>")
             readAction()
-          }
-        case _ =>
-          io.send(clientId, "Nieznana akcja. Uzyj: f / c / r <ilosc>")
-          readAction()
+        }
       }
     }
     readAction()
@@ -296,12 +335,12 @@ object NetworkGame {
 
   private def showCards(cards: List[model.Card]): String = cards.map(_.toString).mkString("  ")
 
-  private def showHoleCards(io: GameIO, cmap: Map[String, String], players: List[Player], eligibleSeats: List[Int]): Unit = {
+  private def showHoleCards(io: GameIO, session: GameSession, cmap: Map[String, String], players: List[Player], eligibleSeats: List[Int]): Unit = {
     eligibleSeats.foreach { i =>
       val p = players(i)
       if (p.playerType == PlayerType.Human && !p.folded) {
         cmap.get(p.name).foreach { cid =>
-          io.send(cid, s"  [SEKRET] Twoje karty: ${p.hand}")
+          if(session.clients.containsKey(cid)) io.send(cid, s"  [SEKRET] Twoje karty: ${p.hand}")
         }
       }
     }

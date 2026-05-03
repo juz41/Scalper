@@ -1,16 +1,13 @@
 package network
 
-import scala.io.StdIn
-
 object MultiplayerApp {
   def main(args: Array[String]): Unit = {
-    println("=== SCALPER MULTIPLAYER ===")
+    println("=== SCALPER MULTIPLAYER (Lobby Enabled) ===")
 
     args.headOption match {
       case Some("--server") =>
         val port    = argValue(args, "--port").flatMap(_.toIntOption).getOrElse(2137)
-        val players = argValue(args, "--players").flatMap(_.toIntOption).getOrElse(2)
-        PekkoServer.start(port, players)
+        PekkoServer.start(port)
 
       case Some("--client") =>
         val host = argValue(args, "--address").getOrElse {
@@ -21,17 +18,13 @@ object MultiplayerApp {
           println("Błąd: --client wymaga --port <port>")
           sys.exit(1)
         }
-        val name = argValue(args, "--name").getOrElse {
-          print("Podaj swoje imię w grze: ")
-          val n = StdIn.readLine().trim
-          if (n.isEmpty) "Gracz" else n
-        }
-        PekkoClient.start(host, port, name)
+
+        PekkoClient.start(host, port)
 
       case _ =>
         println("Użycie:")
-        println("  --server [--port 2137] [--players 2]")
-        println("  --client --address <ip> --port <port> [--name <imię>]")
+        println("  --server [--port 2137]")
+        println("  --client --address <ip> --port <port>")
         sys.exit(1)
     }
   }

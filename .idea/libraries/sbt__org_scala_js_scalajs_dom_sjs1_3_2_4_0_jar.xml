@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.scala-js:scalajs-dom_sjs1_3:2.4.0:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.scala-js" artifactId="scalajs-dom_sjs1_3" version="2.4.0" baseVersion="2.4.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-js/scalajs-dom_sjs1_3/2.4.0/scalajs-dom_sjs1_3-2.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-js/scalajs-dom_sjs1_3/2.4.0/scalajs-dom_sjs1_3-2.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

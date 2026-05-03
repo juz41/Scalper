@@ -1,0 +1,201 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(__runWatch console0, Some(e201058a-dcfc-4107-8b3c-4d04060ad11d), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(sbtStashOnFailure, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(__preWatch console0, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(run, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / run[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /home/pawel/Studia/sem6/scala/Scalper/target/scala-3.8.2/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:3:7 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m3 |[0m[33mimport[0m scalafx.application.[33mJFXApp3[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m  |[0m       ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m       Not found: scalafx[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:4:7 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m4 |[0m[33mimport[0m scalafx.scene.[33mScene[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m  |[0m       ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m       Not found: scalafx[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:5:7 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m5 |[0m[33mimport[0m scalafx.scene.layout.{[33mBorderPane[0m, [33mHBox[0m, [33mVBox[0m}[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m  |[0m       ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m       Not found: scalafx[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:6:7 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m6 |[0m[33mimport[0m scalafx.scene.control.{[33mButton[0m, [33mLabel[0m}[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m  |[0m       ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m       Not found: scalafx[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:7:7 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m7 |[0m[33mimport[0m scalafx.geometry.{[33mInsets[0m, [33mPos[0m}[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m  |[0m       ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m       Not found: scalafx[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m  |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:11:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m11 |[0m    stage = [33mnew[0m [33mJFXApp3[0m.[32mPrimaryStage[0m {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: stage - did you mean start?[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:12:6 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m12 |[0m      title = [32m"Scalper - Texas Hold'em & Omaha"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m      ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m      Not found: title[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:13:6 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m13 |[0m      scene = [33mnew[0m [32mScene[0m([32m800[0m, [32m600[0m) {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m      ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m      Not found: scene[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:16:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m16 |[0m        stylesheets.add([32m"styles.css"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: stylesheets[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:18:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m18 |[0m        root = [33mnew[0m [32mBorderPane[0m {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: root[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:19:10 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m19 |[0m          styleClass.add([32m"poker-table"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m          ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m          Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:22:10 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m22 |[0m          top = [33mnew[0m [32mVBox[0m {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m          ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m          Not found: top[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:23:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m23 |[0m            alignment = [33mPos[0m.[33mCenter[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: alignment[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:24:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m24 |[0m            spacing = [32m15[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: spacing[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:25:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m25 |[0m            padding = [33mInsets[0m([32m30[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: padding[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:26:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m26 |[0m            children = [33mSeq[0m([0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: children[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:27:37 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m27 |[0m              [33mnew[0m [32mLabel[0m([32m"Pula: 0"[0m) { styleClass.add([32m"pot-label"[0m) },[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                     ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                     Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:29:16 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m29 |[0m                alignment = [33mPos[0m.[33mCenter[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                Not found: alignment[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:30:16 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m30 |[0m                spacing = [32m10[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                Not found: spacing[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:31:16 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m31 |[0m                children = [33mSeq[0m([0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                Not found: children[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:32:39 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m32 |[0m                  [33mnew[0m [32mLabel[0m([32m"[ ? ]"[0m) { styleClass.add([32m"card"[0m) },[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                       ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                       Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:33:39 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m33 |[0m                  [33mnew[0m [32mLabel[0m([32m"[ ? ]"[0m) { styleClass.add([32m"card"[0m) },[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                       ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                       Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:34:39 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m34 |[0m                  [33mnew[0m [32mLabel[0m([32m"[ ? ]"[0m) { styleClass.add([32m"card"[0m) }[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                       ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                       Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:41:10 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m41 |[0m          bottom = [33mnew[0m [32mHBox[0m {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m          ^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m          Not found: bottom[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:42:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m42 |[0m            alignment = [33mPos[0m.[33mCenter[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: alignment[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:43:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m43 |[0m            spacing = [32m20[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: spacing[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:44:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m44 |[0m            padding = [33mInsets[0m([32m30[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: padding[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:45:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m45 |[0m            children = [33mSeq[0m([0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m            Not found: children[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:46:35 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m46 |[0m              [33mnew[0m [32mButton[0m([32m"Fold"[0m) { styleClass.add([32m"btn-fold"[0m) },[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                   ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                   Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:47:43 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m47 |[0m              [33mnew[0m [32mButton[0m([32m"Check / Call"[0m) { styleClass.add([32m"btn-call"[0m) },[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                           ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                           Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /home/pawel/Studia/sem6/scala/Scalper/src/Game/scala/ui.scala:48:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m48 |[0m              [33mnew[0m [32mButton[0m([32m"Raise"[0m) { styleClass.add([32m"btn-raise"[0m) }[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                    ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                    Not found: styleClass[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m longer explanation available when compiling with `-explain`[0m
+[0m[[0m[31merror[0m] [0m[0m31 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 2 s, completed May 2, 2026, 4:28:15 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(resumeFromFailure, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(sbtPopOnFailure, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(__postWatch console0, None, Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(resumeFromFailure, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(__waitWatch console0, None, None)[0m

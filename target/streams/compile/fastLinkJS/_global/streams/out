@@ -1,0 +1,25 @@
+[0m[[0m[0minfo[0m] [0m[0mFast optimizing /home/julian/IdeaProjects/Scalper/target/scala-3.3.3/scalper-fastopt[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: Compute reachability: 238911 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: Assemble LinkedClasses: 16007 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: 277991 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Batch mode: true[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Incremental part: 68596 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Elidable constructors: 1754 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Optimizing 2524 methods.[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Optimizer part: 387721 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: 463241 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: Compute reachability: 22955 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: Assemble LinkedClasses: 5587 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: 30167 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Calculate Dependency Info: 1302 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Analyze Modules: 415 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Assemble Modules: 3660 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: 6395 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Generate Classes: 205747 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Write trees: 32827 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Class tree cache stats: reused: 0 -- invalidated: 192[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Method tree cache stats: reused: 0 -- invalidated: 555[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Post transforms: total: 921 -- nested: 21 -- nested avoided: 91[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: 258096 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mBasicBackend: Write result: 26671 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mBasicBackend: total modules: 1; re-written: 1[0m

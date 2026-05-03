@@ -1,0 +1,4 @@
+# Routes
+# Phase 1: single stub endpoint – full REST API added in Phase 2
+
+GET  /  controllers.HomeController.index()

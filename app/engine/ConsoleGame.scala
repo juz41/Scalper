@@ -33,26 +33,26 @@ object ConsoleGame {
   private val SmallBlind    = 10
   private val BigBlind      = 20
 
-//  def main(args: Array[String]): Unit = {
-//    println("=== Texas Hold'em ===")
-//    println("Actions: f = fold  |  c = call/check  |  r <amount> = raise")
-//    println()
-//
-//    val numHumans = askInt("How many human players? (0+)", min = 0)
-//    val numAIs    = askInt("How many AI players?    (1+)", min = 1)
-//
-//    val humans = (1 to numHumans).map { i =>
-//      Player(s"Player $i", StartingChips, Hand.empty, PlayerType.Human)
-//    }.toList
-//
-//    val ais = (1 to numAIs).map { i =>
-//      Player(s"Bot $i", StartingChips, Hand.empty, PlayerType.Computer)
-//    }.toList
-//
-//    val players = humans ++ ais
-//    println(s"\nStarting game with ${players.map(_.name).mkString(", ")}")
-//    gameLoop(players, dealerIndex = 0, round = 1)
-//  }
+  def main(args: Array[String]): Unit = {
+    println("=== Texas Hold'em ===")
+    println("Actions: f = fold  |  c = call/check  |  r <amount> = raise")
+    println()
+
+    val numHumans = askInt("How many human players? (0+)", min = 0)
+    val numAIs    = askInt("How many AI players?    (1+)", min = 1)
+
+    val humans = (1 to numHumans).map { i =>
+      Player(s"Player $i", StartingChips, Hand.empty, PlayerType.Human)
+    }.toList
+
+    val ais = (1 to numAIs).map { i =>
+      Player(s"Bot $i", StartingChips, Hand.empty, PlayerType.Computer)
+    }.toList
+
+    val players = humans ++ ais
+    println(s"\nStarting game with ${players.map(_.name).mkString(", ")}")
+    gameLoop(players, dealerIndex = 0, round = 1)
+  }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 

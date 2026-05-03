@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="root:main [file:///home/julian/IdeaProjects/Scalper/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21">
+  <component name="DisplayModuleName">
+    <option name="name" value="poker-scala.main" />
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_25">
     <output url="file://$MODULE_DIR$/../../../target/scala-2.13/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../app">
@@ -15,6 +18,7 @@
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/resource_managed/main" />
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main">
       <sourceFolder url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/src_managed/main" />
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/twirl/main" />
@@ -30,6 +34,9 @@
     <orderEntry type="library" name="sbt: com.typesafe.play:play-logback_2.13:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-filters-helpers_2.13:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-guice_2.13:2.9.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-actor-typed_2.13:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-stream_2.13:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-http_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.13:2.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play_2.13:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-streams_2.13:2.9.4:jar" level="project" />
@@ -37,9 +44,15 @@
     <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.5.6:jar" level="project" />
     <orderEntry type="library" name="sbt: com.google.inject:guice:6.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.google.inject.extensions:guice-assistedinject:6.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-actor_2.13:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-slf4j_2.13:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:2.0.13:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-protobuf-v3_2.13:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivestreams:reactive-streams:1.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe:ssl-config-core_2.13:0.6.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-http-core_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-build-link:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-configuration_2.13:2.9.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:2.0.13:jar" level="project" />
     <orderEntry type="library" name="sbt: org.slf4j:jul-to-slf4j:2.0.13:jar" level="project" />
     <orderEntry type="library" name="sbt: org.slf4j:jcl-over-slf4j:2.0.13:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-actor_2.13:2.6.21:jar" level="project" />
@@ -60,17 +73,17 @@
     <orderEntry type="library" name="sbt: com.typesafe.play:play-json_2.13:2.10.6:jar" level="project" />
     <orderEntry type="library" name="sbt: com.google.guava:guava:32.1.3-jre:jar" level="project" />
     <orderEntry type="library" name="sbt: javax.inject:javax.inject:1:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.typesafe:ssl-config-core_2.13:0.6.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.reactivestreams:reactive-streams:1.0.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-stream_2.13:2.6.21:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-parsing_2.13:10.2.10:jar" level="project" />
     <orderEntry type="library" name="sbt: ch.qos.logback:logback-core:1.5.6:jar" level="project" />
     <orderEntry type="library" name="sbt: jakarta.inject:jakarta.inject-api:2.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: aopalliance:aopalliance:1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.google.errorprone:error_prone_annotations:2.21.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.typesafe.play:play-exceptions:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe:config:1.4.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-parsing_2.13:1.0.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.parboiled:parboiled_2.13:2.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.play:play-exceptions:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_2.13:1.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.lz4:lz4-java:1.8.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />

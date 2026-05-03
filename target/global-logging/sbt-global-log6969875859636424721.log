@@ -1,0 +1,25 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(fastLinkJS, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / fastLinkJS[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/org/scala-js/scalajs-linker_2.12/1.16.0/scalajs-linker_2.12-1.16.0.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/org/scala-js/scalajs-linker_2.12/1.16.0/scalajs-linker_2.12-1.16.0.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220202/closure-compiler-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220202/closure-compiler-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/com/google/javascript/closure-compiler-main/v20220202/closure-compiler-main-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/com/google/javascript/closure-compiler-main/v20220202/closure-compiler-main-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/com/google/javascript/closure-compiler-parent/v20220202/closure-compiler-parent-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/com/google/javascript/closure-compiler-parent/v20220202/closure-compiler-parent-v20220202.pom[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220202/closure-compiler-v20220202.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloading https://repo1.maven.org/maven2/org/scala-js/scalajs-linker_2.12/1.16.0/scalajs-linker_2.12-1.16.0.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/org/scala-js/scalajs-linker_2.12/1.16.0/scalajs-linker_2.12-1.16.0.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mdownloaded https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220202/closure-compiler-v20220202.jar[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 9 Scala sources to /home/julian/IdeaProjects/Scalper/target/scala-3.3.3/classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m
+[0m[[0m[0minfo[0m] [0m[0mFast optimizing /home/julian/IdeaProjects/Scalper/target/scala-3.3.3/scalper-fastopt[0m
+[0m[[0m[0mdebug[0m] [0m[0mGlobal IR cache stats: reused: 0 -- invalidated: 62 -- trees read: 440[0m
+[0m[[0m[32msuccess[0m] [0m[0mTotal time: 7 s, completed May 2, 2026, 7:22:56 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

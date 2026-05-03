@@ -8,7 +8,7 @@ object MultiplayerApp {
 
     args.headOption match {
       case Some("--server") =>
-        val port    = argValue(args, "--port").flatMap(_.toIntOption).getOrElse(8080)
+        val port    = argValue(args, "--port").flatMap(_.toIntOption).getOrElse(2137)
         val players = argValue(args, "--players").flatMap(_.toIntOption).getOrElse(2)
         PekkoServer.start(port, players)
 
@@ -30,7 +30,7 @@ object MultiplayerApp {
 
       case _ =>
         println("Użycie:")
-        println("  --server [--port 8080] [--players 2]")
+        println("  --server [--port 2137] [--players 2]")
         println("  --client --address <ip> --port <port> [--name <imię>]")
         sys.exit(1)
     }

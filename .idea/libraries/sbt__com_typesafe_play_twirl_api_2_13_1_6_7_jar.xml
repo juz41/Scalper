@@ -2,11 +2,11 @@
   <library name="sbt: com.typesafe.play:twirl-api_2.13:1.6.7:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="com.typesafe.play" artifactId="twirl-api_2.13" version="1.6.7" baseVersion="1.6.7" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/twirl-api_2.13/1.6.7/twirl-api_2.13-1.6.7.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/twirl-api_2.13/1.6.7/twirl-api_2.13-1.6.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/twirl-api_2.13/1.6.7/twirl-api_2.13-1.6.7-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/twirl-api_2.13/1.6.7/twirl-api_2.13-1.6.7-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

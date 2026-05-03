@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="root:main [file:///home/julian/IdeaProjects/Scalper/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="root:main [file:///home/pawel/Studia/sem6/scala/Scalper/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
   <component name="DisplayModuleName">
     <option name="name" value="poker-scala.main" />
   </component>
@@ -18,7 +18,7 @@
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/resource_managed/main" />
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main">
       <sourceFolder url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../target/scala-2.13/routes/main" isTestSource="false" generated="true" />
     </content>
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/src_managed/main" />
     <content url="file://$MODULE_DIR$/../../../target/scala-2.13/twirl/main" />

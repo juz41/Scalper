@@ -2,7 +2,7 @@
   <configuration default="false" name="Client" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="network.MultiplayerApp" />
     <module name="poker-scala.main" />
-    <option name="PROGRAM_PARAMETERS" value="--client --address 127.0.0.1 --port 8080" />
+    <option name="PROGRAM_PARAMETERS" value="--client --address 127.0.0.1 --port 2137" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

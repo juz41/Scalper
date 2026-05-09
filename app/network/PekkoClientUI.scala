@@ -96,6 +96,8 @@ class State {
   var callAmount:  Int     = 0
   var minRaise:    Int     = 0
   var inLobby:     Boolean = true
+  var localName:   String  = ""
+  var lastJoinedName: String = ""
 
   def localSeat: Option[Seat] = seats.find(_.isLocal)
 
@@ -124,43 +126,65 @@ class State {
 // ═══════════════════════════════════════════════════════════════════════════════
 object Parser {
   // Pot / chips
-  val potRe      = """(?i)(?:pot|pula)\s*[:\-]\s*(\d+)""".r
-  val chipsRe    = """(?i)(?:chips?|zeton[oy]?|stack)\s*[:\-]\s*(\d+)""".r
-  val callRe     = """(?i)call\s*\((\d+)\)""".r
+  val potRe      = """(?i)pot\s*[:\-]\s*(\d+)""".r
+  val chipsRe    = """(?i)^\s*(.+?):\s*(\d+)\s+chips""".r
+  val callRe     = """(?i)to-call\s*[:\-]\s*(\d+)""".r
   val minRaiseRe = """(?i)min\s*[:\-]\s*(\d+)""".r
 
   // Cards
-  val myCardRe = """(?i)(?:your\s+cards?|twoje\s+karty|hand)\s*[:\-]\s*(.+)""".r
+  val myCardRe = """(?i)(?:your\s+(?:hole\s+)?cards?|hand)\s*[:\-]\s*(.+)""".r
   val tableRe  = """(?i)(?:community|board|flop|turn|river|table)\s*[:\-]\s*(.+)""".r
 
   // Showdown reveal – "PlayerName: A♠ K♥"  or  "[PlayerName] shows A♠ K♥"
-  val showRe   = """(?i)(?:\[([^\]]+)\]|^([A-Za-z0-9 _\-]+))\s*(?:shows?|:)\s+([2-9TJQKA10]+[\u2660\u2665\u2666\u2663].*)""".r
+  val showRe   = """(?i)(?:\[([^\]]+)\]|^\s*(.+?))\s*(?:shows?|:)\s+([2-9TJQKA10]+[\u2660\u2665\u2666\u2663].*)""".r
 
   // Players
-  val joinRe    = """(?i)\*{2,}\s*(.+?)\s+(?:joined|dołączył)""".r
-  val leftRe    = """(?i)\[([^\]]+)\]\s*(?:left|opuścił|opuscil)""".r
-  val sessionRe = """(?i)(?:SESSION|SESJ[AI])\s*[:\-]\s*([A-Z0-9]{4})""".r
+  val joinRe    = """(?i)\*{2,}\s*(.+?)\s+joined""".r
+  val leftRe    = """(?i)\[([^\]]+)\]\s*(?:left|disconnected)""".r
+  val sessionRe = """(?i)SESSION[^:]*[:\-]\s*([A-Z0-9]{4})""".r
 
   // Actions
-  val foldRe    = """(?i)\[([^\]]+)\]\s+(?:folds?|pasuje)""".r
-  val betRe     = """(?i)\[([^\]]+)\]\s+(?:bets?|raises?|podbija)[^\d]*(\d+)""".r
+  val foldRe    = """(?i)^\s*(.+?)\s+folds?""".r
+  val betRe     = """(?i)^\s*(.+?)\s+(?:bets?|raises?|calls?|checks?)[^\d]*(\d*)""".r
   val activeRe  = """(?i)\[([^\]]+)\]\s+(?:it's your turn|action|your turn)""".r
-  val dealerRe  = """(?i)\[([^\]]+)\]\s+is\s+the\s+dealer""".r
+  val dealerRe  = """(?i)Dealer:\s*(.+)""".r
 
-  val newRoundRe = """(?i)(?:new\s+(?:round|hand)|hand\s*#|nowa\s+runda|nowe\s+rozdanie|rozdanie\s*#)""".r
-  val winRe      = """(?i)(?:wins?|winner|wygry)""".r
+  val newRoundRe = """(?i)(?:new\s+(?:round|hand)|hand\s*#|blinds:)""".r
+  val winRe      = """(?i)(?:wins?|winner)""".r
 
   def process(msg: String, st: State): Unit = {
-    sessionRe.findFirstMatchIn(msg).foreach(m => st.sessionCode = m.group(1))
+    joinRe.findFirstMatchIn(msg).foreach { m =>
+      val name = m.group(1).trim
+      st.addPlayer(name)
+      st.lastJoinedName = name
+    }
+
+    sessionRe.findFirstMatchIn(msg).foreach { m =>
+      st.sessionCode = m.group(1)
+      st.inLobby = true
+      if (st.localName.isEmpty && st.lastJoinedName.nonEmpty) {
+        st.localName = st.lastJoinedName
+        st.seats.find(_.name == st.localName).foreach { s =>
+          s.isLocal = true
+          s.backCards = 0
+        }
+      }
+    }
 
     if (newRoundRe.findFirstIn(msg).isDefined) {
       st.fullReset(); st.round = "Pre-Flop"
     }
 
-    potRe.findFirstMatchIn(msg)     .foreach(m => st.pot        = m.group(1).toInt)
-    chipsRe.findFirstMatchIn(msg)   .foreach(m => st.myChips    = m.group(1).toInt)
-    callRe.findFirstMatchIn(msg)    .foreach(m => st.callAmount = m.group(1).toInt)
-    minRaiseRe.findFirstMatchIn(msg).foreach(m => st.minRaise   = m.group(1).toInt)
+    potRe.findFirstMatchIn(msg).foreach(m => st.pot = m.group(1).toInt)
+    chipsRe.findFirstMatchIn(msg).foreach { m =>
+      val name = m.group(1).trim
+      val chips = m.group(2).toInt
+      st.addPlayer(name)
+      st.seats.find(_.name == name).foreach(_.chips = chips)
+      if (name == st.localName) st.myChips = chips
+    }
+    callRe.findFirstMatchIn(msg).foreach(m => st.callAmount = m.group(1).toInt)
+    minRaiseRe.findFirstMatchIn(msg).foreach(m => st.minRaise = m.group(1).toInt)
 
     // Local player's hole cards
     myCardRe.findFirstMatchIn(msg).foreach { m =>
@@ -194,7 +218,6 @@ object Parser {
       }
     }
 
-    joinRe.findFirstMatchIn(msg).foreach(m => st.addPlayer(m.group(1).trim))
     leftRe.findFirstMatchIn(msg).foreach(m => st.removePlayer(m.group(1).trim))
 
     foldRe.findFirstMatchIn(msg).foreach { m =>
@@ -205,7 +228,9 @@ object Parser {
 
     betRe.findFirstMatchIn(msg).foreach { m =>
       st.seats.find(_.name == m.group(1)).foreach { s =>
-        s.bet = m.group(2).toInt; s.active = false
+        val amtStr = m.group(2)
+        if (amtStr != null && amtStr.nonEmpty) s.bet = amtStr.toInt
+        s.active = false
       }
     }
 
@@ -221,8 +246,8 @@ object Parser {
 
     // Lobby / game state transitions
     val lo = msg.toLowerCase
-    if (lo.contains("lobby") || lo.contains("joined the room")) st.inLobby = true
-    if (lo.contains("starting") || lo.contains("rozpoczynamy") ||
+    if (lo.contains("lobby")) st.inLobby = true
+    if (lo.contains("starting") || lo.contains("start game") || lo.contains("round") ||
       newRoundRe.findFirstIn(msg).isDefined)                  st.inLobby = false
     if (winRe.findFirstIn(msg).isDefined)                        st.round   = "Showdown"
   }
@@ -230,17 +255,17 @@ object Parser {
   def isActionPrompt(p: String): Boolean = {
     val lo = p.toLowerCase
     lo.contains("fold") || lo.contains("call") || lo.contains("raise") || lo.contains("check") ||
-      lo.contains("action") || lo.contains("akcj")
+      lo.contains("action")
   }
   def isMenuPrompt(p: String): Boolean =
     p.contains("1") && p.contains("2") &&
       (p.toLowerCase.contains("choose") || p.toLowerCase.contains("select") ||
-        p.toLowerCase.contains("wybierz") || p.toLowerCase.contains("menu"))
+        p.toLowerCase.contains("menu"))
   def isNamePrompt(p: String): Boolean = {
-    val lo = p.toLowerCase; lo.contains("name") || lo.contains("imi")
+    val lo = p.toLowerCase; lo.contains("name")
   }
   def isCodePrompt(p: String): Boolean = {
-    val lo = p.toLowerCase; lo.contains("code") || lo.contains("kod")
+    val lo = p.toLowerCase; lo.contains("code")
   }
 }
 
@@ -463,9 +488,10 @@ class TablePanel(val st: State) extends JPanel {
 
   private def paintCards(g2: Graphics2D, s: Seat, cX: Int, cY: Int, gap: Int): Unit = {
     if (s.folded) return  // no cards drawn for folded players
+    if (s.isLocal) return // Local player's cards are shown in the bottom left corner
 
     if (s.hand.nonEmpty) {
-      // Show face-up cards (local player, or opponent at showdown)
+      // Show face-up cards (opponent at showdown)
       s.hand.zipWithIndex.foreach { case (c, i) =>
         CardR.drawCard(g2, cX + i * (CardR.W + gap), cY, c)
       }
@@ -587,15 +613,16 @@ class LogPanel extends JPanel(new BorderLayout()) {
 // ═══════════════════════════════════════════════════════════════════════════════
 //  ROUNDED BUTTON
 // ═══════════════════════════════════════════════════════════════════════════════
-class RBtn(label: String, bg: Color, w: Int = 0, h: Int = 34) extends JButton(label) {
-  setFont(K.F_BOLD); setForeground(K.WHITE); setBackground(bg)
+class RBtn(label: String, initialBg: Color, w: Int = 0, h: Int = 34) extends JButton(label) {
+  setFont(K.F_BOLD); setForeground(K.WHITE); setBackground(initialBg)
   setFocusPainted(false); setBorderPainted(false); setOpaque(true)
   setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
   if (w > 0) setPreferredSize(new Dimension(w, h))
   override def paintComponent(g: Graphics): Unit = {
     val g2 = g.asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g2.setColor(if (getModel.isRollover) bg.brighter() else bg)
+    val currentBg = getBackground
+    g2.setColor(if (getModel.isRollover) currentBg.brighter() else currentBg)
     g2.fillRoundRect(0, 0, getWidth, getHeight, 9, 9)
     super.paintComponent(g)
   }
@@ -676,7 +703,7 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   private val leaveBtn = new RBtn("Leave \u2716",   K.RED,   112)
   startBtn.addActionListener(_ => rawSend("/start"))
   botBtn.addActionListener(_   => rawSend("/bot"))
-  leaveBtn.addActionListener(_ => rawSend("/wyjdz"))
+  leaveBtn.addActionListener(_ => rawSend("/leave"))
   private val lchat = mkField("Chat…"); lchat.setPreferredSize(new Dimension(170, 34))
   private val lsend = new RBtn("Chat \u25ba", new Color(48, 60, 76), 88)
   lsend.addActionListener(_ => { val t = lchat.getText.trim; if (t.nonEmpty) { rawSend(t); lchat.setText("") } })
@@ -691,8 +718,7 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
 
   // 6. Game actions
   private val foldBtn  = new RBtn("Fold (F)",       K.RED,   106)
-  private val checkBtn = new RBtn("Check (CH)",     K.BLUE,  112)
-  private val callBtn  = new RBtn("Call",            K.GREEN, 106)
+  private val checkCallBtn = new RBtn("Check (C)",  K.BLUE,  120)
   private val raiseFld = new JTextField("0") {
     setFont(K.F_BODY); setBackground(K.INPUT_BG); setForeground(K.WHITE); setCaretColor(K.GOLD)
     setBorder(new CompoundBorder(new LineBorder(K.BORDER, 1, true), BorderFactory.createEmptyBorder(5, 8, 5, 8)))
@@ -702,14 +728,13 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   raiseBtn.setForeground(new Color(26, 20, 4))
 
   foldBtn.addActionListener(_  => act("f"))
-  checkBtn.addActionListener(_ => act("ch"))
-  callBtn.addActionListener(_  => act("c"))
+  checkCallBtn.addActionListener(_ => act("c"))
   raiseBtn.addActionListener(_ => act("r " + raiseFld.getText.trim))
   raiseFld.addActionListener(_ => act("r " + raiseFld.getText.trim))
 
   private val actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 9)) {
     setBackground(K.PANEL)
-    add(foldBtn); add(checkBtn); add(callBtn); add(sep())
+    add(foldBtn); add(checkCallBtn); add(sep())
     add(new JLabel("Amount:") { setFont(K.F_SMALL); setForeground(K.SILVER) })
     add(raiseFld); add(raiseBtn)
   }
@@ -747,8 +772,15 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   def syncHand(hand: Seq[Card], chips: Int): Unit = SwingUtilities.invokeLater(() => {
     _hand = hand; _chips = chips; handPanel.repaint()
   })
-  def syncCallAmount(n: Int): Unit = SwingUtilities.invokeLater(() =>
-    callBtn.setText(if (n > 0) s"Call $n" else "Call"))
+  def syncCallAmount(n: Int): Unit = SwingUtilities.invokeLater(() => {
+    if (n > 0) {
+      checkCallBtn.setText(s"Call $n (C)")
+      checkCallBtn.setBackground(K.GREEN)
+    } else {
+      checkCallBtn.setText("Check (C)")
+      checkCallBtn.setBackground(K.BLUE)
+    }
+  })
   def syncMinRaise(n: Int): Unit = SwingUtilities.invokeLater(() =>
     if (n > 0) raiseFld.setText(n.toString))
 
@@ -973,15 +1005,23 @@ object PekkoClientUI {
 
     val sink = Sink.foreach[Message] {
       case TextMessage.Strict(raw) if raw.startsWith("MSG:") =>
-        val msg = raw.drop(4)
+        val rawMsg = raw.drop(4)
+        val msg = """\b([2-9TJQKA]|10)([HDCS])\b""".r.replaceAllIn(rawMsg, m => {
+          val suit = m.group(2) match {
+            case "H" => "\u2665"
+            case "D" => "\u2666"
+            case "C" => "\u2663"
+            case "S" => "\u2660"
+            case other => other
+          }
+          m.group(1) + suit
+        })
         log.addMsg(msg)
         Parser.process(msg, st)
         println(s"[DEBUG] msg='$msg' chips=${st.myChips} inLobby=${st.inLobby} seats=${st.seats.count(_.occupied)}")
         // Keep header session badge up to date
         if (st.sessionCode.nonEmpty) header.setSession(st.sessionCode)
 
-        // Register local player once chips appear (first chip message = we are seated)
-        if (st.myChips > 0 && st.localSeat.isEmpty) st.addPlayer("You", local = true)
         st.localSeat.foreach { s => s.chips = st.myChips; s.hand = st.myHand }
 
         input.syncHand(st.myHand, st.myChips)
@@ -992,7 +1032,11 @@ object PekkoClientUI {
         table.refresh()
 
       case TextMessage.Strict(raw) if raw.startsWith("PROMPT:") =>
-        input.onPrompt(raw.drop(7))
+        val p = raw.drop(7)
+        Parser.process(p, st)
+        input.syncCallAmount(st.callAmount)
+        input.syncMinRaise(st.minRaise)
+        input.onPrompt(p)
 
       case _ =>
     }

@@ -301,7 +301,7 @@ object CardR {
   // Empty card outline (community card placeholder)
   def drawEmpty(g: Graphics2D, x: Int, y: Int): Unit = {
     val s0 = g.getStroke
-    g.setColor(new Color(255, 255, 255, 30))
+    g.setColor(new Color(255, 255, 255, 80))
     g.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
       1f, Array(5f, 4f), 0f))
     g.drawRoundRect(x, y, W, H, 8, 8)
@@ -626,19 +626,17 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     override def paintComponent(g: Graphics): Unit = {
       super.paintComponent(g)
       val g2 = g.asInstanceOf[Graphics2D]
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON)
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
       g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
       val cY = (getHeight - CardR.H) / 2
-      if (_hand.nonEmpty) {
+      if (_hand.nonEmpty)
         _hand.zipWithIndex.foreach { case (c, i) => CardR.drawCard(g2, 10 + i * (CardR.W + 8), cY, c) }
-      } else {
+      else
         for (i <- 0 until 2) CardR.drawEmpty(g2, 10 + i * (CardR.W + 8), cY)
-      }
       g2.setFont(K.F_SBOLD); g2.setColor(K.GOLD)
       g2.drawString(s"${_chips} chips", 10, getHeight - 6)
     }
   }
-  handPanel.setVisible(false)
 
   // ── CardLayout switcher ───────────────────────────────────────────────────
   private val cl   = new CardLayout()
@@ -737,8 +735,13 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     else                               { cl.show(deck, "chat");   chatFld.requestFocusInWindow() }
   })
 
-  def showLobby(): Unit  = SwingUtilities.invokeLater(() => { promptBar.setVisible(false); cl.show(deck, "lobby") })
-  def showGame(): Unit   = SwingUtilities.invokeLater(() => handPanel.setVisible(true))
+  def showLobby(): Unit = SwingUtilities.invokeLater(() => {
+    promptBar.setVisible(false)
+    cl.show(deck, "lobby")
+  })
+  def showGame(): Unit = SwingUtilities.invokeLater(() => {
+    cl.show(deck, "chat")
+  })
   def hidePrompt(): Unit = SwingUtilities.invokeLater(() => promptBar.setVisible(false))
 
   def syncHand(hand: Seq[Card], chips: Int): Unit = SwingUtilities.invokeLater(() => {
@@ -806,7 +809,7 @@ class ConnectScreen(onConnect: (String, Int) => Unit) extends JPanel(new GridBag
   private val titleLbl  = lbl("\u2660  POKER ONLINE  \u2660", new Font("Georgia", Font.BOLD, 22), K.GOLD, SwingConstants.CENTER)
   private val subLbl    = lbl("Connect to a game server", K.F_SMALL, K.SILVER, SwingConstants.CENTER)
   private val hostField = fld("localhost")
-  private val portField = fld("8080")
+  private val portField = fld("2137")
   private val statusLbl = lbl("", K.F_SMALL, K.RED, SwingConstants.CENTER)
   private val connectBtn = new RBtn("Connect to Server", K.FELT, 200, 42)
 
@@ -973,7 +976,7 @@ object PekkoClientUI {
         val msg = raw.drop(4)
         log.addMsg(msg)
         Parser.process(msg, st)
-
+        println(s"[DEBUG] msg='$msg' chips=${st.myChips} inLobby=${st.inLobby} seats=${st.seats.count(_.occupied)}")
         // Keep header session badge up to date
         if (st.sessionCode.nonEmpty) header.setSession(st.sessionCode)
 

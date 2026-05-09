@@ -4,9 +4,11 @@ import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest}
+import org.apache.pekko.http.scaladsl.settings.ClientConnectionSettings
 import org.apache.pekko.stream.OverflowStrategy
 import org.apache.pekko.stream.scaladsl.{Flow, Keep, Sink, Source}
 
+import scala.concurrent.duration._
 import scala.io.StdIn
 
 object PekkoClient {
@@ -14,7 +16,6 @@ object PekkoClient {
     implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PokerClient")
     import system.executionContext
 
-    val req = WebSocketRequest(s"ws://$host:$port/poker")
     val (queue, source) = Source.queue[Message](100, OverflowStrategy.dropTail).preMaterialize()
 
     val sink = Sink.foreach[Message] {
@@ -28,9 +29,16 @@ object PekkoClient {
     }
 
     val flow = Flow.fromSinkAndSource(sink, source).watchTermination()(Keep.right)
-    val (upgradeResponse, closed) = Http().singleWebSocketRequest(req, flow)
+    val clientSettings = ClientConnectionSettings(system)
+      .withIdleTimeout(Duration.Inf)
+    val req = WebSocketRequest(s"ws://$host:$port/poker")
+    val (upgradeResponse, closed) = Http().singleWebSocketRequest(
+      request = req,
+      clientFlow = flow,
+      settings = clientSettings
+    )
 
-    // Wątek odpowiedzialny za ciągłe słuchanie klawiatury
+    // Thread for keyboard input
     val inputThread = new Thread(() => {
       var continue = true
       while (continue) {
@@ -46,7 +54,7 @@ object PekkoClient {
     inputThread.start()
 
     closed.onComplete(_ => {
-      println("\nRozłączono z serwerem.")
+      println("\nDisconnected from server.")
       system.terminate()
       sys.exit(0)
     })

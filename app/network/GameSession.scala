@@ -4,10 +4,10 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentLinkedQueue}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 class GameSession(val code: String) {
-  // clientId -> imię gracza
+  // clientId is player name
   val clients = new ConcurrentHashMap[String, String]()
 
-  // Kolejka graczy oraz botów oczekujących na wejście do gry (w następnym rozdaniu)
+  // Queue of players and bots waiting for next round to play
   val pendingBots = new AtomicInteger(0)
   val pendingPlayers = new ConcurrentLinkedQueue[(String, String)]()
 

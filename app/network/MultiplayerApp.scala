@@ -2,7 +2,7 @@ package network
 
 object MultiplayerApp {
   def main(args: Array[String]): Unit = {
-    println("=== SCALPER MULTIPLAYER (Lobby Enabled) ===")
+    println("=== SCALPER ===")
 
     args.headOption match {
       case Some("--server") =>
@@ -11,18 +11,18 @@ object MultiplayerApp {
 
       case Some("--client") =>
         val host = argValue(args, "--address").getOrElse {
-          println("Błąd: --client wymaga --address <ip>")
+          println("Error: --client needs --address <ip>")
           sys.exit(1)
         }
         val port = argValue(args, "--port").flatMap(_.toIntOption).getOrElse {
-          println("Błąd: --client wymaga --port <port>")
+          println("Error: --client needs --port <port>")
           sys.exit(1)
         }
 
         PekkoClient.start(host, port)
 
       case _ =>
-        println("Użycie:")
+        println("Usage:")
         println("  --server [--port 2137]")
         println("  --client --address <ip> --port <port>")
         sys.exit(1)

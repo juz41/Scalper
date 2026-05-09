@@ -11,6 +11,8 @@ libraryDependencies ++= Seq(
   "org.apache.pekko" %% "pekko-http" % pekkoHttpVersion
 )
 
+javaOptions += "--add-opens=java.base/java.lang=ALL-UNNAMED"
+
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(

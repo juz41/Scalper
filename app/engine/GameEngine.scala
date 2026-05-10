@@ -290,7 +290,8 @@ class GameEngine(io: EngineIO, initialPlayers: List[Player]) {
         val action = player.playerType match {
           case PlayerType.Human =>
             if (io.isConnected(player.name)) {
-              humanAction(player, potV, toCall)
+              // Pass alreadyBet so that "r N" means "add N chips on top of what's already in"
+              humanAction(player, potV, toCall, alreadyBet = bets(seatI))
             } else {
               io.broadcast(s"[${player.name}] lost connection. Automatic fold.")
               Action.Fold
@@ -336,6 +337,8 @@ class GameEngine(io: EngineIO, initialPlayers: List[Player]) {
             Action.Call
 
           case Action.Raise(amount) =>
+            // `amount` is the intended total street bet for this player
+            // (humanAction already adds alreadyBet, so this is always a true total)
             val legalMin = currentBetV + 1
             val capped = amount.max(legalMin).min(player.chips + bets(seatI))
             val additional = (capped - bets(seatI)).max(0)
@@ -343,7 +346,7 @@ class GameEngine(io: EngineIO, initialPlayers: List[Player]) {
             bets(seatI) += additional
             potV += additional
             currentBetV = bets(seatI)
-            io.broadcast(s"${player.name} raises to $currentBetV. Pot: $potV")
+            io.broadcast(s"${player.name} raises to $currentBetV (added $additional). Pot: $potV")
             Action.Raise(currentBetV)
         }
 
@@ -372,7 +375,9 @@ class GameEngine(io: EngineIO, initialPlayers: List[Player]) {
 
   // ─── Human input ───────────────────────────────────────────────────────────
 
-  private def humanAction(player: Player, pot: Int, toCall: Int): Action = {
+  // `alreadyBet` – how many chips this player has already put in this street.
+  //   "r N" means "add N chips right now", so the Action carries a total of N + alreadyBet.
+  private def humanAction(player: Player, pot: Int, toCall: Int, alreadyBet: Int = 0): Action = {
     val callWord = if (toCall == 0) "check (c)" else s"call $toCall (c)"
     val raiseOpt = if (player.chips > toCall) s" | raise <chips to add> (r 80)" else ""
     val prompt = s"[Your move] chips:${player.chips} pot:$pot to-call:$toCall | fold(f) $callWord$raiseOpt"
@@ -390,9 +395,13 @@ class GameEngine(io: EngineIO, initialPlayers: List[Player]) {
           case "c" => Action.Call
           case s if s.startsWith("r ") =>
             val extra = s.drop(2).toIntOption.getOrElse(0)
-            if (extra > toCall && extra <= player.chips) Action.Raise(extra)
-            else {
-              io.send(player.name, s"Invalid raise. Enter chips to add: must be > ${toCall + 1} and <= ${player.chips}")
+            // `extra` = chips the player wants to ADD right now.
+            // Must be more than toCall (otherwise it's just a call) and affordable.
+            if (extra > toCall && extra <= player.chips) {
+              // Convert to a total street-bet so bettingRound can compare against currentBetV.
+              Action.Raise(extra + alreadyBet)
+            } else {
+              io.send(player.name, s"Invalid raise. Chips to add must be > $toCall (to exceed current bet) and <= ${player.chips} (your stack).")
               readAction()
             }
           case _ =>

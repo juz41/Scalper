@@ -2,11 +2,11 @@
   <library name="sbt: io.jsonwebtoken:jjwt-api:0.11.5:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="io.jsonwebtoken" artifactId="jjwt-api" version="0.11.5" baseVersion="0.11.5" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

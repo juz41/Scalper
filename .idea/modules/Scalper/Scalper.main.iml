@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="root:main [file:///home/pawel/Studia/sem6/scala/Scalper/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
+  <component name="DisplayModuleName">
+    <option name="name" value="Scalper.main" />
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_25">
+    <output url="file://$MODULE_DIR$/../../../target/scala-3.8.2/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../src/Game/scala">
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/Game/scala" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/scala" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../target/scala-3.8.2/resource_managed/main" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-3.8.2/src_managed/main" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sbt: scala-sdk-3.8.2" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_sjs1_3:3.8.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-js:scalajs-library_2.13:1.15.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-js:scalajs-dom_sjs1_3:2.4.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-js:scalajs-scalalib_2.13:3.8.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:3.8.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-js:scalajs-javalib:1.20.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.8.2:jar" level="project" />
+  </component>
+</module>

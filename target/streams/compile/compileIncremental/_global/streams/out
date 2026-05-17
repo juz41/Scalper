@@ -1,4 +1,0 @@
-[0m[[0m[0mdebug[0m] [0m[0m[zinc] IncrementalCompile -----------[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncrementalCompile.incrementalCompile[0m
-[0m[[0m[0mdebug[0m] [0m[0mprevious = Stamps for: 56 products, 14 sources, 2 libraries[0m
-[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/target/scala-2.13/routes/main/controllers/javascript/JavaScriptReverseRoutes.scala, ${BASE}/app/logic/HandRank.scala, ${BASE}/app/engine/Action.scala, ${BASE}/target/scala-2.13/routes/main/controllers/routes.java, ${BASE}/target/scala-2.13/routes/main/router/Routes.scala, ${BASE}/app/model/Player.scala, ${BASE}/target/scala-2.13/routes/main/controllers/ReverseRoutes.scala, ${BASE}/app/engine/ComputerAI.scala, ${BASE}/app/logic/HandEvaluator.scala, ${BASE}/app/model/Card.scala, ${BASE}/app/controllers/HomeController.scala, ${BASE}/app/model/Deck.scala, ${BASE}/app/engine/ConsoleGame.scala, ${BASE}/target/scala-2.13/routes/main/router/RoutesPrefix.scala)[0m

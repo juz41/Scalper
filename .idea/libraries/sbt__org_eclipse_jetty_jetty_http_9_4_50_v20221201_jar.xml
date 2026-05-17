@@ -2,11 +2,11 @@
   <library name="sbt: org.eclipse.jetty:jetty-http:9.4.50.v20221201:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="org.eclipse.jetty" artifactId="jetty-http" version="9.4.50.v20221201" baseVersion="9.4.50.v20221201" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.4.50.v20221201/jetty-http-9.4.50.v20221201.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.4.50.v20221201/jetty-http-9.4.50.v20221201.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.4.50.v20221201/jetty-http-9.4.50.v20221201-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.4.50.v20221201/jetty-http-9.4.50.v20221201-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

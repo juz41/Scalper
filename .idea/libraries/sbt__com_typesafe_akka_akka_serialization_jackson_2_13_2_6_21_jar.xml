@@ -2,11 +2,11 @@
   <library name="sbt: com.typesafe.akka:akka-serialization-jackson_2.13:2.6.21:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="com.typesafe.akka" artifactId="akka-serialization-jackson_2.13" version="2.6.21" baseVersion="2.6.21" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-serialization-jackson_2.13/2.6.21/akka-serialization-jackson_2.13-2.6.21.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-serialization-jackson_2.13/2.6.21/akka-serialization-jackson_2.13-2.6.21.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-serialization-jackson_2.13/2.6.21/akka-serialization-jackson_2.13-2.6.21-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-serialization-jackson_2.13/2.6.21/akka-serialization-jackson_2.13-2.6.21-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

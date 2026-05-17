@@ -2,11 +2,11 @@
   <library name="sbt: aopalliance:aopalliance:1.0:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="aopalliance" artifactId="aopalliance" version="1.0" baseVersion="1.0" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

@@ -2,11 +2,11 @@
   <library name="sbt: commons-validator:commons-validator:1.7:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="commons-validator" artifactId="commons-validator" version="1.7" baseVersion="1.7" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/commons-validator/commons-validator/1.7/commons-validator-1.7.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/commons-validator/commons-validator/1.7/commons-validator-1.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/commons-validator/commons-validator/1.7/commons-validator-1.7-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/commons-validator/commons-validator/1.7/commons-validator-1.7-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

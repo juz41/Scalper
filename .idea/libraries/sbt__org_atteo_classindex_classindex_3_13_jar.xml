@@ -2,11 +2,11 @@
   <library name="sbt: org.atteo.classindex:classindex:3.13:jar" type="java-imported" external-system-id="SBT">
     <properties groupId="org.atteo.classindex" artifactId="classindex" version="3.13" baseVersion="3.13" />
     <CLASSES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/org/atteo/classindex/classindex/3.13/classindex-3.13.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/atteo/classindex/classindex/3.13/classindex-3.13.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.var/app/com.jetbrains.IntelliJ-IDEA-Ultimate/cache/coursier/v1/https/repo1.maven.org/maven2/org/atteo/classindex/classindex/3.13/classindex-3.13-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/atteo/classindex/classindex/3.13/classindex-3.13-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

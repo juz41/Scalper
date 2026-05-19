@@ -11,6 +11,7 @@ import java.awt._
 import java.awt.geom._
 import javax.swing._
 import javax.swing.border._
+import javax.swing.event.ChangeListener
 import javax.swing.text._
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -95,14 +96,19 @@ class State {
   var sessionCode: String  = ""
   var callAmount:  Int     = 0
   var minRaise:    Int     = 0
+  var currentStreetBet: Int = 0
   var inLobby:     Boolean = true
   var localName:   String  = ""
   var lastJoinedName: String = ""
 
   def localSeat: Option[Seat] = seats.find(_.isLocal)
 
+  def streetReset(): Unit = {
+    currentStreetBet = 0; seats.foreach(_.bet = 0)
+  }
+
   def fullReset(): Unit = {
-    community = Nil; pot = 0; myHand = Nil; callAmount = 0; minRaise = 0
+    community = Nil; pot = 0; myHand = Nil; callAmount = 0; minRaise = 0; currentStreetBet = 0
     seats.foreach(_.reset())
   }
 
@@ -130,6 +136,7 @@ object Parser {
   val chipsRe    = """(?i)^\s*(.+?):\s*(\d+)\s+chips""".r
   val callRe     = """(?i)to-call\s*[:\-]\s*(\d+)""".r
   val minRaiseRe = """(?i)min\s*[:\-]\s*(\d+)""".r
+  val myChipsRe  = """(?i)chips[:\-]\s*(\d+)""".r
 
   // Cards
   val myCardRe = """(?i)(?:your\s+(?:hole\s+)?cards?|hand)\s*[:\-]\s*(.+)""".r
@@ -145,11 +152,14 @@ object Parser {
 
   // Actions
   val foldRe    = """(?i)^\s*(.+?)\s+folds?""".r
-  val betRe     = """(?i)^\s*(.+?)\s+(?:bets?|raises?|calls?|checks?)[^\d]*(\d*)""".r
+  val raiseRe   = """(?i)^\s*(.+?)\s+raises?\s+to\s+(\d+)\s*\(added\s+(\d+)\)""".r
+  val callAmtRe = """(?i)^\s*(.+?)\s+calls?\s+(\d+)""".r
+  val checkRe   = """(?i)^\s*(.+?)\s+checks?""".r
   val activeRe  = """(?i)\[([^\]]+)\]\s+(?:it's your turn|action|your turn)""".r
   val dealerRe  = """(?i)Dealer:\s*(.+)""".r
 
   val newRoundRe = """(?i)(?:new\s+(?:round|hand)|hand\s*#|blinds:)""".r
+  val streetRe   = """(?i)──\s*(?:flop|turn|river)\s*──""".r
   val winRe      = """(?i)(?:wins?|winner)""".r
 
   def process(msg: String, st: State): Unit = {
@@ -220,16 +230,33 @@ object Parser {
 
     leftRe.findFirstMatchIn(msg).foreach(m => st.removePlayer(m.group(1).trim))
 
+    // Reset bets on new street
+    if (streetRe.findFirstIn(msg).isDefined) st.streetReset()
+
     foldRe.findFirstMatchIn(msg).foreach { m =>
       st.seats.find(_.name == m.group(1)).foreach { s =>
-        s.folded = true; s.active = false; s.backCards = 0; s.hand = Nil
+        s.folded = true; s.active = false; s.backCards = 0; s.hand = Nil; s.bet = 0
       }
     }
 
-    betRe.findFirstMatchIn(msg).foreach { m =>
+    raiseRe.findFirstMatchIn(msg).foreach { m =>
       st.seats.find(_.name == m.group(1)).foreach { s =>
-        val amtStr = m.group(2)
-        if (amtStr != null && amtStr.nonEmpty) s.bet = amtStr.toInt
+        val total = m.group(2).toInt
+        val added = m.group(3).toInt
+        s.bet = total; s.active = false; s.chips -= added
+        st.currentStreetBet = total
+      }
+    }
+
+    callAmtRe.findFirstMatchIn(msg).foreach { m =>
+      st.seats.find(_.name == m.group(1)).foreach { s =>
+        val added = m.group(2).toInt
+        s.bet = st.currentStreetBet; s.active = false; s.chips -= added
+      }
+    }
+
+    checkRe.findFirstMatchIn(msg).foreach { m =>
+      st.seats.find(_.name == m.group(1)).foreach { s =>
         s.active = false
       }
     }
@@ -724,8 +751,29 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     setBorder(new CompoundBorder(new LineBorder(K.BORDER, 1, true), BorderFactory.createEmptyBorder(5, 8, 5, 8)))
     setPreferredSize(new Dimension(72, 34))
   }
+  private val raiseSlider = new JSlider(0, 1000, 0) {
+    setBackground(K.PANEL); setForeground(K.GOLD)
+    setPreferredSize(new Dimension(140, 34))
+    setFocusable(false)
+  }
   private val raiseBtn = new RBtn("Raise (R)", K.YELLOW, 106)
   raiseBtn.setForeground(new Color(26, 20, 4))
+
+  // Bidirectional sync: slider <-> text field
+  private var _sliderSync = false
+  raiseSlider.addChangeListener((_: javax.swing.event.ChangeEvent) => if (!_sliderSync) {
+    _sliderSync = true; raiseFld.setText(raiseSlider.getValue.toString); _sliderSync = false
+  })
+  raiseFld.getDocument.addDocumentListener(new javax.swing.event.DocumentListener {
+    private def sync(): Unit = if (!_sliderSync) {
+      _sliderSync = true
+      raiseFld.getText.trim.toIntOption.foreach(v => raiseSlider.setValue(v))
+      _sliderSync = false
+    }
+    override def insertUpdate(e: javax.swing.event.DocumentEvent): Unit = sync()
+    override def removeUpdate(e: javax.swing.event.DocumentEvent): Unit = sync()
+    override def changedUpdate(e: javax.swing.event.DocumentEvent): Unit = sync()
+  })
 
   foldBtn.addActionListener(_  => act("f"))
   checkCallBtn.addActionListener(_ => act("c"))
@@ -736,7 +784,7 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     setBackground(K.PANEL)
     add(foldBtn); add(checkCallBtn); add(sep())
     add(new JLabel("Amount:") { setFont(K.F_SMALL); setForeground(K.SILVER) })
-    add(raiseFld); add(raiseBtn)
+    add(raiseSlider); add(raiseFld); add(raiseBtn)
   }
   deck.add(actionRow, "action")
 
@@ -782,7 +830,10 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     }
   })
   def syncMinRaise(n: Int): Unit = SwingUtilities.invokeLater(() =>
-    if (n > 0) raiseFld.setText(n.toString))
+    if (n > 0) { raiseSlider.setMinimum(n); raiseFld.setText(n.toString) })
+
+  def syncAvailableChips(n: Int): Unit = SwingUtilities.invokeLater(() =>
+    if (n > 0) raiseSlider.setMaximum(n))
 
   // ── Private helpers ───────────────────────────────────────────────────────
   private def act(cmd: String): Unit = {
@@ -1022,7 +1073,11 @@ object PekkoClientUI {
         // Keep header session badge up to date
         if (st.sessionCode.nonEmpty) header.setSession(st.sessionCode)
 
-        st.localSeat.foreach { s => s.chips = st.myChips; s.hand = st.myHand }
+        st.localSeat.foreach { s =>
+          s.hand = st.myHand
+          // Sync chips FROM seat (parser may have subtracted bets) — only overwrite if round-start reset it
+          if (st.myChips != s.chips && s.chips >= 0) st.myChips = s.chips
+        }
 
         input.syncHand(st.myHand, st.myChips)
         input.syncCallAmount(st.callAmount)
@@ -1036,6 +1091,7 @@ object PekkoClientUI {
         Parser.process(p, st)
         input.syncCallAmount(st.callAmount)
         input.syncMinRaise(st.minRaise)
+        Parser.myChipsRe.findFirstMatchIn(p).foreach(m => input.syncAvailableChips(m.group(1).toInt))
         input.onPrompt(p)
 
       case _ =>

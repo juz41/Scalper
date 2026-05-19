@@ -238,7 +238,16 @@ object GameEngine {
   }
 
   private def startStreet(s: GameState, street: Street, comm: List[Card], deck: Deck): (GameState, List[GameEvent]) = {
-    val pending = orderedSeatsFrom(s.eligibleSeats, s.eligibleSeats(0), includeStart = true, s.players)
+    // Post-flop: action starts from the first active player after the dealer (button acts last)
+    val dealerSeat = s.dealerIdx % s.players.size
+    val dealerPosInEligible = s.eligibleSeats.indexOf(dealerSeat)
+    val startSeat = if (dealerPosInEligible >= 0) {
+      s.eligibleSeats((dealerPosInEligible + 1) % s.eligibleSeats.size)
+    } else {
+      // Dealer busted: find the next eligible seat after the dealer's position
+      s.eligibleSeats.find(_ > dealerSeat).getOrElse(s.eligibleSeats.head)
+    }
+    val pending = orderedSeatsFrom(s.eligibleSeats, startSeat, includeStart = true, s.players)
     val ns = s.copy(phase = GamePhase.Betting(street, pending), community = comm, deck = deck, currentBet = 0, streetBets = Map.empty)
     (ns, List(GameEvent.StreetStarted(street, comm)))
   }
@@ -270,7 +279,7 @@ object GameEngine {
     val startIdx = eligible.indexOf(startSeat)
     if (startIdx < 0 || eligible.isEmpty) return Nil
     val offset = if (includeStart) 0 else 1
-    (offset until (eligible.size + offset)).map(k => eligible((startIdx + k) % eligible.size)).filter(i => !ps(i).folded && ps(i).chips > 0).toList
+    (offset until eligible.size).map(k => eligible((startIdx + k) % eligible.size)).filter(i => !ps(i).folded && ps(i).chips > 0).toList
   }
 
   @tailrec

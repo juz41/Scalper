@@ -108,9 +108,10 @@ object NetworkGame {
                   case s if s.startsWith("r ") =>
                     val extra = s.drop(2).toIntOption.getOrElse(0)
                     val betSoFar = gameState.streetBets.getOrElse(gameState.players.indexOf(player), 0)
-                    if (extra > toCall && extra <= chips) Some(Action.Raise(extra + betSoFar))
+                    if (extra > 0 && extra <= chips && (extra > toCall || extra == chips)) Some(Action.Raise(extra + betSoFar))
                     else {
-                      send(pName, s"Invalid input. Chips to add must be > $toCall and <= $chips.")
+                      val minAdd = (toCall + 1).min(chips)
+                      send(pName, s"Invalid raise. Chips to add must be >= $minAdd and <= $chips (or all-in).")
                       None
                     }
                   case _ =>

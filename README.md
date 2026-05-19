@@ -8,8 +8,7 @@ This project aims to create a web app that allows users to play poker.
 ## Module breakdown
 
 - **Game engine** – core domain models (`Card`, `Deck`, `Hand`, `Player`), hand evaluator, and game loop logic
-- **Frontend and web app** – Play Framework routes and controllers; Twirl views or a JavaScript client consuming the REST API
-- **AI for playing poker** – pluggable computer opponents, starting with random moves and expanding toward strategy-based logic
+- **Desktop app** – Play Framework routes and controllers; Client consuming the REST API
 
 ---
 
@@ -19,9 +18,9 @@ This project aims to create a web app that allows users to play poker.
 |------|-------|
 | Game engine & hand evaluator | Patryk Ząbik |
 | REST API & Play controllers | Paweł Szymański |
-| AI opponents | Julian Zalewski, Patryk Ząbik |
+| AI opponents | Julian Zalewski |
 | Frontend / views | Julian Zalewski |
-| Tests & CI | Paweł Szymański |
+| Tests & CI | Paweł Szymański, Patryk Ząbik |
 
 ---
 

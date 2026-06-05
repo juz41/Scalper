@@ -594,18 +594,21 @@ class TablePanel(val st: State) extends JPanel {
 // ═══════════════════════════════════════════════════════════════════════════════
 class LogPanel extends JPanel(new BorderLayout()) {
   setBackground(K.PANEL)
-  setPreferredSize(new Dimension(235, 0))
+  setPreferredSize(new Dimension(320, 0))
   setBorder(new MatteBorder(0, 1, 0, 0, K.BORDER))
 
-  private val pane = new JTextPane {
-    setEditable(false); setBackground(K.BG); setForeground(K.WHITE); setFont(K.F_MONO)
-    setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8))
-    getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE)
-  }
-  private val scroll = new JScrollPane(pane) {
+  private val msgContainer = new JPanel()
+  msgContainer.setLayout(new BoxLayout(msgContainer, BoxLayout.Y_AXIS))
+  msgContainer.setBackground(K.PANEL)
+
+  private val scroll = new JScrollPane(msgContainer) {
     setBorder(BorderFactory.createEmptyBorder())
-    setBackground(K.BG); getViewport.setBackground(K.BG)
+    setBackground(K.PANEL)
+    getViewport.setBackground(K.PANEL)
+    setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
+    getVerticalScrollBar.setUnitIncrement(16)
   }
+
   private val hdr = new JLabel("  \u2663  GAME LOG") {
     setFont(K.F_SBOLD); setForeground(K.GOLD); setOpaque(true)
     setBackground(new Color(18, 24, 34))
@@ -613,28 +616,107 @@ class LogPanel extends JPanel(new BorderLayout()) {
   }
   add(hdr, BorderLayout.NORTH); add(scroll, BorderLayout.CENTER)
 
-  private val doc = pane.getStyledDocument
-  private def attr(fg: Color, bold: Boolean = false): SimpleAttributeSet = {
-    val a = new SimpleAttributeSet()
-    StyleConstants.setForeground(a, fg); StyleConstants.setBold(a, bold)
-    StyleConstants.setFontFamily(a, K.F_MONO.getFamily)
-    StyleConstants.setFontSize(a, K.F_MONO.getSize); a
+  def addMsg(msg: String): Unit = SwingUtilities.invokeLater(() => {
+    val isChat = msg.startsWith("[Chat]")
+    val isSys = msg.startsWith("***") || msg.startsWith("===") ||
+      msg.startsWith("[!]") || msg.startsWith("---") ||
+      msg.toLowerCase.contains("wins") ||
+      msg.toLowerCase.contains("winner") ||
+      msg.toLowerCase.contains("joined") ||
+      msg.toLowerCase.contains("left")
+
+    val (align, shapeType, bgCol, fgCol) =
+      if (isChat) {
+        (FlowLayout.LEFT, "chat", new Color(42, 60, 90), K.WHITE)
+      } else if (isSys) {
+        (FlowLayout.CENTER, "system", new Color(75, 35, 35), K.GOLD)
+      } else {
+        (FlowLayout.RIGHT, "game", new Color(30, 36, 46), K.SILVER)
+      }
+
+    val text = if (isChat) msg.replaceFirst("\\[Chat\\]\\s*", "") else msg
+
+    val bubble = new MessageBubble(text, shapeType, bgCol, fgCol)
+    val wrap = new JPanel(new FlowLayout(align, 8, 4))
+    wrap.setBackground(K.PANEL)
+    wrap.add(bubble)
+
+    msgContainer.add(wrap)
+    msgContainer.revalidate()
+
+    SwingUtilities.invokeLater(() => {
+      val bar = scroll.getVerticalScrollBar
+      bar.setValue(bar.getMaximum)
+    })
+
+    if (msgContainer.getComponentCount > 150) {
+      msgContainer.remove(0)
+    }
+  })
+}
+
+// Additional class for message bubbles
+class MessageBubble(text: String, shape: String, bgCol: Color, fgCol: Color) extends JPanel(new BorderLayout()) {
+  setOpaque(false)
+
+  val area = new JTextArea(text) {
+    setOpaque(false)
+    setEditable(false)
+    setLineWrap(true)
+    setWrapStyleWord(true)
+    setFont(K.F_BODY)
+    setForeground(fgCol)
+
+    if (shape == "system") {
+      setAlignmentX(0.5f)
+    }
+
+    override def getPreferredSize: Dimension = {
+      val base = super.getPreferredSize
+      val maxWidth = 300
+      if (base.width > maxWidth) {
+        setSize(new Dimension(maxWidth, Short.MaxValue))
+        new Dimension(maxWidth, super.getPreferredSize.height)
+      } else base
+    }
   }
 
-  def addMsg(msg: String): Unit = SwingUtilities.invokeLater(() => {
-    val sty =
-      if (msg.startsWith("***") || msg.startsWith("==="))  attr(K.GOLD,   bold = true)
-      else if (msg.startsWith("[Chat]"))                    attr(new Color(110, 195, 255))
-      else if (msg.contains("\u2660") || msg.contains("\u2665") ||
-        msg.contains("\u2666") || msg.contains("\u2663")) attr(K.YELLOW, bold = true)
-      else if (msg.toLowerCase.contains("wins") ||
-        msg.toLowerCase.contains("winner"))          attr(K.GREEN,  bold = true)
-      else if (msg.startsWith("[!]"))                       attr(K.RED)
-      else if (msg.startsWith("---"))                       attr(new Color(80, 96, 115))
-      else                                                  attr(K.SILVER)
-    doc.insertString(doc.getLength, msg + "\n", sty)
-    if (doc.getLength > 24000) doc.remove(0, 6000)
-  })
+  if (shape == "system") {
+    val centerPanel = new JPanel()
+    centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.X_AXIS))
+    centerPanel.setOpaque(false)
+    centerPanel.add(Box.createHorizontalGlue())
+    centerPanel.add(area)
+    centerPanel.add(Box.createHorizontalGlue())
+    add(centerPanel, BorderLayout.CENTER)
+  } else {
+    add(area, BorderLayout.CENTER)
+  }
+
+  setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10))
+
+  override def paintComponent(g: Graphics): Unit = {
+    val g2 = g.asInstanceOf[Graphics2D]
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    g2.setColor(bgCol)
+
+    shape match {
+      case "chat" =>
+        g2.fillRoundRect(0, 0, getWidth, getHeight, 16, 16)
+
+      case "system" =>
+        g2.fillRect(0, 0, getWidth, getHeight)
+        g2.setColor(new Color(255, 255, 255, 30))
+        g2.drawRect(0, 0, getWidth - 1, getHeight - 1)
+
+      case "game" =>
+        val arc = 12
+        g2.fillRoundRect(0, 0, getWidth, getHeight, arc, arc)
+        g2.setColor(new Color(255, 255, 255, 15))
+        g2.drawRoundRect(0, 0, getWidth - 1, getHeight - 1, arc, arc)
+    }
+    super.paintComponent(g)
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

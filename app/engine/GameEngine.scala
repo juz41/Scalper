@@ -4,7 +4,6 @@ import model._
 import logic.HandEvaluator
 import scala.annotation.tailrec
 
-// ─── Zdarzenia Domenowe (Fakty z gry, NIE instrukcje IO) ─────────────────────
 sealed trait GameEvent
 object GameEvent {
   case class GameFinished(reason: String) extends GameEvent
@@ -20,7 +19,6 @@ object GameEvent {
   case class PlayerBusted(playerName: String) extends GameEvent
 }
 
-// ─── Fazy Gry ────────────────────────────────────────────────────────────────
 sealed trait GamePhase
 object GamePhase {
   case object AwaitingStart extends GamePhase
@@ -34,7 +32,6 @@ object GamePhase {
   case object GameOver extends GamePhase
 }
 
-// ─── Stan Gry ────────────────────────────────────────────────────────────────
 case class GameState(
                       players: List[Player],
                       dealerIdx: Int = 0,
@@ -50,14 +47,13 @@ case class GameState(
                       seatPositions: Map[Int, String] = Map.empty
                     )
 
-// ─── Silnik Pokerowy (Czysto Funkcyjny) ──────────────────────────────────────
 object GameEngine {
   private val SmallBlind = 10
   private val BigBlind = 20
 
   /**
-   * Automatycznie przesuwa grę do przodu, generując nowy stan i zdarzenia.
-   * Jeśli gra wymaga interakcji gracza (faza Betting), zatrzymuje się i zwraca zdarzenie ActionRequested.
+   * Advances the game and emits events.
+   * Stops when a player action is required.
    */
   def advance(s: GameState, connectedPlayers: Set[String]): (GameState, List[GameEvent]) = {
     s.phase match {
@@ -134,11 +130,10 @@ object GameEngine {
           if (p.folded || p.chips <= 0) {
             (s.copy(phase = GamePhase.Betting(street, pendingSeats.tail)), Nil)
           } else if (p.playerType == PlayerType.Human && !isConnected(p, connectedPlayers)) {
-            // Automatyczny fold dla rozłączonego
+            // Automatic fold for disconnected player
             applyAction(s, seatI, Action.Fold, isForced = true)
           } else {
             val toCall = (s.currentBet - s.streetBets.getOrElse(seatI, 0)).max(0).min(p.chips)
-            // Zwracamy ten sam stan, ale z żądaniem akcji (System czeka)
             (s, List(GameEvent.ActionRequested(p.name, toCall, s.pot, p.chips)))
           }
         }
@@ -185,7 +180,7 @@ object GameEngine {
   }
 
   /**
-   * Wywoływana gdy warstwa sieciowa dostarczy decyzję gracza.
+   * Applies a player action.
    */
   def processPlayerAction(s: GameState, playerName: String, action: Action): Either[String, (GameState, List[GameEvent])] = {
     s.phase match {
@@ -196,7 +191,9 @@ object GameEngine {
     }
   }
 
-  // Wewnętrzna aplikacja akcji i aktualizacja puli/historii
+  /**
+   *  Apply action and update state
+   */
   private def applyAction(s: GameState, seatI: Int, action: Action, isForced: Boolean): (GameState, List[GameEvent]) = {
     val p = s.players(seatI)
     val betSoFar = s.streetBets.getOrElse(seatI, 0)
@@ -237,6 +234,9 @@ object GameEngine {
     (s.copy(players = ps, pot = pot, currentBet = currentBet, streetBets = bets, history = history, phase = GamePhase.Betting(sPhase.street, pending)), events)
   }
 
+  /**
+   * Starts a new betting street and prepares the action order.
+   */
   private def startStreet(s: GameState, street: Street, comm: List[Card], deck: Deck): (GameState, List[GameEvent]) = {
     // Post-flop: action starts from the first active player after the dealer (button acts last)
     val dealerSeat = s.dealerIdx % s.players.size
@@ -252,6 +252,9 @@ object GameEngine {
     (ns, List(GameEvent.StreetStarted(street, comm)))
   }
 
+  /**
+   * Awards the pot to the last remaining active player and advances the game.
+   */
   private def awardPot(s: GameState): (GameState, List[GameEvent]) = {
     val remaining = activePlayers(s.players, s.eligibleSeats)
     var ps = s.players
@@ -265,6 +268,9 @@ object GameEngine {
     (ns, GameEvent.PotWon(List((ps(idx).name, s.pot)), None) :: busted)
   }
 
+  /**
+   * Detects players who lost all chips and emits elimination events.
+   */
   private def handleBusted(before: List[Player], after: List[Player]): (List[GameEvent], List[Player]) = {
     val events = before.zip(after).collect {
       case (p, c) if p.chips > 0 && c.chips <= 0 => GameEvent.PlayerBusted(c.name)
@@ -272,9 +278,19 @@ object GameEngine {
     (events, after)
   }
 
+  /**
+   * Returns whether player is connected.
+   */
   private def isConnected(p: Player, connected: Set[String]): Boolean = p.playerType == PlayerType.Computer || connected.contains(p.name)
+
+  /**
+   * Returns the seats of active players still in the hand.
+   */
   private def activePlayers(ps: List[Player], eligible: List[Int]): List[Int] = eligible.filter(i => !ps(i).folded)
 
+  /**
+   * Returns active seats in table order starting from the given seat.
+   */
   private def orderedSeatsFrom(eligible: List[Int], startSeat: Int, includeStart: Boolean, ps: List[Player]): List[Int] = {
     val startIdx = eligible.indexOf(startSeat)
     if (startIdx < 0 || eligible.isEmpty) return Nil

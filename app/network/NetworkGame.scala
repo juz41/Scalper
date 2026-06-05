@@ -33,7 +33,7 @@ object NetworkGame {
     def ask(name: String, prompt: String): String =
       clientMap.get(name).filter(session.clients.containsKey).map(io.ask(_, prompt)).getOrElse("f")
 
-    // Funkcja pomocnicza do przetwarzania zdarzeń wygenerowanych przez silnik
+    // Process events emitted by the game engine
     def handleEvents(events: List[GameEvent]): Unit = {
       events.foreach {
         case GameEvent.RoundStarted(rnd, dealer, chips) =>
@@ -154,18 +154,15 @@ object NetworkGame {
               history = gameState.history
             )
 
-            // Wywołanie sztucznej inteligencji
             io.broadcast(s"${player.name} (${ctx.position}) thinks...")
             Thread.sleep(1500)
             ComputerAI.decideAction(ctx)
           }
 
-          // Kiedy mamy zweryfikowaną akcję z IO, przekazujemy ją do silnika
+          // Apply validated action to the game engine
           GameEngine.processPlayerAction(gameState, pName, actionToApply) match {
             case Right((sAfterAction, actionEvents)) =>
               gameState = sAfterAction
-              // NAPRAWA: Przetwarzamy zdarzenia akcji natychmiast,
-              // dzięki czemu odpali się case GameEvent.PlayerActed
               handleEvents(actionEvents)
             case Left(err) =>
               send(pName, err)
@@ -190,7 +187,7 @@ object NetworkGame {
       val (newState, events) = GameEngine.advance(gameState, connectedSet())
       gameState = newState
 
-      // Wywołanie głównego przetwarzania zdarzeń z kroku 'advance'
+      // Handle events from the engine step
       handleEvents(events)
     }
 

@@ -3,7 +3,7 @@
 .bsp
 .metals
 .vscode
-
+.vs
 target
 project/target
 project/project/target

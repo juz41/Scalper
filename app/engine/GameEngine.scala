@@ -192,7 +192,7 @@ object GameEngine {
       case GamePhase.Betting(street, pending) if pending.nonEmpty && s.players(pending.head).name == playerName =>
         Right(applyAction(s, pending.head, action, isForced = false))
       case _ =>
-        Left("To nie jest twój ruch lub zła faza gry.")
+        Left("That's not your turn or wrong game phase.")
     }
   }
 

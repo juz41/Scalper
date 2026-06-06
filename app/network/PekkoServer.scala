@@ -157,7 +157,7 @@ object PekkoServer {
             val session = sessions.get(code)
             if (session != null) joinSession(clientId, code, session)
             else {
-              sendTo(clientId, ServerToClient.GameLog("Invalid session code.", false))
+              sendTo(clientId, ServerToClient.GameLog("Invalid session code."))
               clientStates.put(clientId, Menu)
               sendMenu(clientId)
             }
@@ -179,12 +179,12 @@ object PekkoServer {
                 case "/start" =>
                   if (session.isPlaying.compareAndSet(false, true)) {
                     broadcastToSession(code, ServerToClient.LobbyState(inLobby = false))
-                    broadcastToSession(code, ServerToClient.GameLog("*** START GAME ***", false))
+                    broadcastToSession(code, ServerToClient.GameLog("*** START GAME ***"))
                     new Thread(() => NetworkGame.start(code, session)).start()
-                  } else sendTo(clientId, ServerToClient.GameLog("Game already started!", false))
+                  } else sendTo(clientId, ServerToClient.GameLog("Game already started!"))
                 case "/bot" =>
                   session.addBot()
-                  broadcastToSession(code, ServerToClient.GameLog("Added bot.", false))
+                  broadcastToSession(code, ServerToClient.GameLog("Added bot."))
                 case "/leave" =>
                   handleDisconnect(clientId)
                   clientStates.put(clientId, Menu)
@@ -195,7 +195,7 @@ object PekkoServer {
           case _ =>
         }
 
-      case ClientToServer.PlayerAct(_) => // Ignorowane poza głównym loopem gry
+      case ClientToServer.PlayerAct(_) =>
     }
   }
 

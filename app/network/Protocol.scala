@@ -5,7 +5,6 @@ import model.{Card, Rank, Suit}
 import upickle.default._
 
 object Protocol {
-  // Ręczne serializatory dla domenowych typów gry, by nie brudzić oryginalnego modelu
   implicit val rwAction: ReadWriter[Action] = readwriter[ujson.Value].bimap[Action](
     {
       case Action.Fold       => ujson.Obj("$type" -> "Fold")
@@ -29,7 +28,6 @@ object Protocol {
   )
 }
 
-// Wiadomości wysyłane od Serwera do Klienta
 sealed trait ServerToClient
 object ServerToClient {
   import Protocol._
@@ -60,7 +58,6 @@ object ServerToClient {
   implicit val rw: ReadWriter[ServerToClient] = macroRW
 }
 
-// Wiadomości wysyłane od Klienta do Serwera
 sealed trait ClientToServer
 object ClientToServer {
   import Protocol._

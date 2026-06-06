@@ -27,18 +27,12 @@ object NetworkGame {
 
     def connectedSet(): Set[String] = clientMap.keys.filter(n => session.clients.containsKey(clientMap(n))).toSet
 
-//    def send(name: String, msg: String): Unit =
-//      clientMap.get(name).foreach(cid => if (session.clients.containsKey(cid)) io.send(cid, msg))
-//
-//    def ask(name: String, prompt: String): String =
-//      clientMap.get(name).filter(session.clients.containsKey).map(io.ask(_, prompt)).getOrElse("f")
-
     // Process events emitted by the game engine
     def handleEvents(events: List[GameEvent]): Unit = {
       events.foreach {
         case GameEvent.RoundStarted(rnd, dealer, chips) =>
           io.broadcast(ServerToClient.GameLog(s"─── Round $rnd ─── Dealer: $dealer"))
-          chips.foreach { case (name, amount, isConn) =>
+          chips.foreach { case (name, amount, _) =>
             io.broadcast(ServerToClient.SyncPlayer(name, amount, folded = false, bet = 0, active = false))
           }
           io.broadcast(ServerToClient.GameLog("[Start in 5 seconds...\nLast chance for /bot]"))
@@ -58,7 +52,7 @@ object NetworkGame {
         case GameEvent.StreetStarted(street, comm) =>
           io.broadcast(ServerToClient.SyncState(gameState.pot, street.toString, comm, 0))
 
-        case GameEvent.PlayerActed(pName, action, added, pot) =>
+        case GameEvent.PlayerActed(pName, action, added, _) =>
           action match {
             case Action.Fold =>
               io.broadcast(ServerToClient.GameLog(s"$pName folds."))
@@ -73,7 +67,7 @@ object NetworkGame {
               io.broadcast(ServerToClient.SyncPlayer(pName, -1, folded = false, bet = amt, active = false))
           }
 
-        case GameEvent.ShowdownRevealed(comm, hands) =>
+        case GameEvent.ShowdownRevealed(_, hands) =>
           io.broadcast(ServerToClient.GameLog("══ SHOWDOWN ══"))
           hands.foreach { case (name, hand) =>
             io.broadcast(ServerToClient.ShowdownCards(name, hand.cards))
@@ -110,12 +104,11 @@ object NetworkGame {
                 case Right((sAfter, evs)) =>
                   gameState = sAfter
                   handleEvents(evs)
-                case Left(_) => // Wpadnie tutaj jeżeli user wstrzyknie niedozwoloną akcję
+                case Left(_) =>
               }
-              case _ => // Przypadek wyjścia/rozłączenia
+              case _ =>
             }
           } else {
-            // Logika bota zostaje bez zmian (oblicza i woła GameEngine)
             val currentStreet = gameState.phase match {
               case GamePhase.Betting(st, _) => st
               case _                        => Street.PreFlop

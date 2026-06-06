@@ -27,145 +27,112 @@ object NetworkGame {
 
     def connectedSet(): Set[String] = clientMap.keys.filter(n => session.clients.containsKey(clientMap(n))).toSet
 
-    def send(name: String, msg: String): Unit =
-      clientMap.get(name).foreach(cid => if (session.clients.containsKey(cid)) io.send(cid, msg))
-
-    def ask(name: String, prompt: String): String =
-      clientMap.get(name).filter(session.clients.containsKey).map(io.ask(_, prompt)).getOrElse("f")
+//    def send(name: String, msg: String): Unit =
+//      clientMap.get(name).foreach(cid => if (session.clients.containsKey(cid)) io.send(cid, msg))
+//
+//    def ask(name: String, prompt: String): String =
+//      clientMap.get(name).filter(session.clients.containsKey).map(io.ask(_, prompt)).getOrElse("f")
 
     // Process events emitted by the game engine
     def handleEvents(events: List[GameEvent]): Unit = {
       events.foreach {
         case GameEvent.RoundStarted(rnd, dealer, chips) =>
-          io.broadcast(s"\n─── Round $rnd ─── Dealer: $dealer")
+          io.broadcast(ServerToClient.GameLog(s"─── Round $rnd ─── Dealer: $dealer"))
           chips.foreach { case (name, amount, isConn) =>
-            val status = if (!isConn) " (Disconnected)" else ""
-            io.broadcast(s" $name: $amount chips$status")
+            io.broadcast(ServerToClient.SyncPlayer(name, amount, folded = false, bet = 0, active = false))
           }
-          io.broadcast("[Start in 5 seconds...\nLast chance for /bot]")
+          io.broadcast(ServerToClient.GameLog("[Start in 5 seconds...\nLast chance for /bot]"))
           Thread.sleep(5000)
 
         case GameEvent.BlindsPosted(sb, sbAmt, bb, bbAmt) =>
-          io.broadcast(s"\nBlinds: $sb posts SB $sbAmt, $bb posts BB $bbAmt | Pot: ${sbAmt + bbAmt}")
+          io.broadcast(ServerToClient.GameLog(s"Blinds: $sb posts $sbAmt, $bb posts $bbAmt"))
+          io.broadcast(ServerToClient.SyncState(sbAmt + bbAmt, "Pre-Flop", Nil, bbAmt))
+          io.broadcast(ServerToClient.SyncPlayer(sb, -1, folded = false, bet = sbAmt, active = false))
+          io.broadcast(ServerToClient.SyncPlayer(bb, -1, folded = false, bet = bbAmt, active = false))
 
         case GameEvent.HoleCardsDealt(secrets) =>
           secrets.foreach { case (pName, hand) =>
-            send(pName, s" [SECRET] Your hole cards: $hand")
+            io.send(clientMap(pName), ServerToClient.HoleCards(hand.cards))
           }
 
         case GameEvent.StreetStarted(street, comm) =>
-          io.broadcast(s"\n── $street ── Community: ${comm.mkString(" ")}")
+          io.broadcast(ServerToClient.SyncState(gameState.pot, street.toString, comm, 0))
 
         case GameEvent.PlayerActed(pName, action, added, pot) =>
           action match {
-            case Action.Fold => io.broadcast(s"$pName folds.")
-            case Action.Call if added == 0 => io.broadcast(s"$pName checks.")
-            case Action.Call => io.broadcast(s"$pName calls $added. Pot: $pot")
-            case Action.Raise(amt) => io.broadcast(s"$pName raises to $amt (added $added). Pot: $pot")
+            case Action.Fold =>
+              io.broadcast(ServerToClient.GameLog(s"$pName folds."))
+              io.broadcast(ServerToClient.SyncPlayer(pName, -1, folded = true, bet = 0, active = false))
+            case Action.Call if added == 0 =>
+              io.broadcast(ServerToClient.GameLog(s"$pName checks."))
+            case Action.Call =>
+              io.broadcast(ServerToClient.GameLog(s"$pName calls $added."))
+              io.broadcast(ServerToClient.SyncPlayer(pName, -1, folded = false, bet = gameState.streetBets.getOrElse(gameState.players.indexWhere(_.name == pName), 0), active = false))
+            case Action.Raise(amt) =>
+              io.broadcast(ServerToClient.GameLog(s"$pName raises to $amt (added $added)."))
+              io.broadcast(ServerToClient.SyncPlayer(pName, -1, folded = false, bet = amt, active = false))
           }
 
         case GameEvent.ShowdownRevealed(comm, hands) =>
-          io.broadcast("\n══ SHOWDOWN ══")
-          io.broadcast(s"Community: ${comm.mkString(" ")}")
-          hands.foreach { case (name, hand) => io.broadcast(s" $name: $hand") }
-          io.broadcast("")
+          io.broadcast(ServerToClient.GameLog("══ SHOWDOWN ══"))
+          hands.foreach { case (name, hand) =>
+            io.broadcast(ServerToClient.ShowdownCards(name, hand.cards))
+          }
 
         case GameEvent.PotWon(winners, rankOpt) =>
           val totalPot = winners.map(_._2).sum
           if (winners.size > 1) {
-            io.broadcast(s"Tie! Pot of $totalPot split among ${winners.map(_._1).mkString(", ")}")
+            io.broadcast(ServerToClient.GameLog(s"Tie! Pot of $totalPot split among ${winners.map(_._1).mkString(", ")}"))
           } else {
             val byText = rankOpt.map(r => s" with $r!").getOrElse(" (all others folded)!")
-            io.broadcast(s"${winners.head._1} wins the pot of $totalPot$byText")
+            io.broadcast(ServerToClient.GameLog(s"${winners.head._1} wins the pot of $totalPot$byText"))
           }
 
         case GameEvent.PlayerBusted(pName) =>
-          io.broadcast(s"\n$pName has no chips left and is removed from the table.")
+          io.broadcast(ServerToClient.GameLog(s"$pName has no chips left."))
 
         case GameEvent.PlayerDisconnected(pName) =>
-          io.broadcast(s"[$pName] lost connection. Automatic fold.")
+          io.broadcast(ServerToClient.PlayerLeft(pName))
 
         case GameEvent.GameFinished(reason) =>
-          io.broadcast(s"\n$reason")
+          io.broadcast(ServerToClient.GameLog(s"\n$reason"))
+          io.broadcast(ServerToClient.LobbyState(inLobby = true))
 
         case GameEvent.ActionRequested(pName, toCall, pot, chips) =>
           val player = gameState.players.find(_.name == pName).get
 
-          val actionToApply = if (player.playerType == PlayerType.Human) {
-            val callWord = if (toCall == 0) "check (c)" else s"call $toCall (c)"
-            val raiseOpt = if (chips > toCall) s" | raise <chips to add> (r 80)" else ""
-            val prompt = s"[Your move] chips:$chips pot:$pot to-call:$toCall | fold(f) $callWord$raiseOpt"
+          io.broadcast(ServerToClient.SyncPlayer(pName, -1, folded = false, bet = -1, active = true))
 
-            var validAction: Option[Action] = None
-            while (validAction.isEmpty) {
-              val raw = ask(pName, prompt).toLowerCase
-              if (raw.startsWith("/")) {
-                send(pName, "Commands during turn ignored by engine (enter f, c or r) have been processed by lobby.")
-              } else {
-                validAction = raw match {
-                  case "f" => Some(Action.Fold)
-                  case "c" => Some(Action.Call)
-                  case s if s.startsWith("r ") =>
-                    val extra = s.drop(2).toIntOption.getOrElse(0)
-                    val betSoFar = gameState.streetBets.getOrElse(gameState.players.indexOf(player), 0)
-                    if (extra > 0 && extra <= chips && (extra > toCall || extra == chips)) Some(Action.Raise(extra + betSoFar))
-                    else {
-                      val minAdd = (toCall + 1).min(chips)
-                      send(pName, s"Invalid raise. Chips to add must be >= $minAdd and <= $chips (or all-in).")
-                      None
-                    }
-                  case _ =>
-                    send(pName, "Unknown action. Use: f / c / r <amount>")
-                    None
-                }
+          if (player.playerType == PlayerType.Human) {
+            val actionMsg = io.ask(clientMap(pName), ServerToClient.PromptAction(toCall, (toCall + 1).min(chips), chips))
+            actionMsg match {
+              case ClientToServer.PlayerAct(act) => GameEngine.processPlayerAction(gameState, pName, act) match {
+                case Right((sAfter, evs)) =>
+                  gameState = sAfter
+                  handleEvents(evs)
+                case Left(_) => // Wpadnie tutaj jeżeli user wstrzyknie niedozwoloną akcję
               }
+              case _ => // Przypadek wyjścia/rozłączenia
             }
-            validAction.get
           } else {
+            // Logika bota zostaje bez zmian (oblicza i woła GameEngine)
             val currentStreet = gameState.phase match {
               case GamePhase.Betting(st, _) => st
               case _                        => Street.PreFlop
             }
-
             val activeSeats = gameState.eligibleSeats.filter(i => !gameState.players(i).folded)
             val seatIdx = gameState.players.indexWhere(_.name == pName)
+            val opponentsChips = activeSeats.filterNot(_ == seatIdx).map(i => gameState.players(i).name -> gameState.players(i).chips)
+            val opponentsPositions = activeSeats.filterNot(_ == seatIdx).map(i => gameState.players(i).name -> gameState.seatPositions.getOrElse(i, "Unknown")).toMap
 
-            val opponentsChips = activeSeats
-              .filterNot(_ == seatIdx)
-              .map(i => gameState.players(i).name -> gameState.players(i).chips)
+            val ctx = GameContext(currentStreet, gameState.community, player.hand, pot, toCall, chips, gameState.currentBet, activeSeats.size, opponentsChips, gameState.seatPositions.getOrElse(seatIdx, "Unknown"), opponentsPositions, gameState.history)
 
-            val opponentsPositions = activeSeats
-              .filterNot(_ == seatIdx)
-              .map(i => gameState.players(i).name -> gameState.seatPositions.getOrElse(i, "Unknown"))
-              .toMap
-
-            val ctx = GameContext(
-              street = currentStreet,
-              community = gameState.community,
-              holeCards = player.hand,
-              pot = pot,
-              toCall = toCall,
-              availableChips = chips,
-              currentBet = gameState.currentBet,
-              numActivePlayers = activeSeats.size,
-              opponentStacks = opponentsChips,
-              position = gameState.seatPositions.getOrElse(seatIdx, "Unknown"),
-              opponentPositions = opponentsPositions,
-              history = gameState.history
-            )
-
-            io.broadcast(s"${player.name} (${ctx.position}) thinks...")
             Thread.sleep(1500)
-            ComputerAI.decideAction(ctx)
-          }
-
-          // Apply validated action to the game engine
-          GameEngine.processPlayerAction(gameState, pName, actionToApply) match {
-            case Right((sAfterAction, actionEvents)) =>
-              gameState = sAfterAction
-              handleEvents(actionEvents)
-            case Left(err) =>
-              send(pName, err)
+            val act = ComputerAI.decideAction(ctx)
+            GameEngine.processPlayerAction(gameState, pName, act) match {
+              case Right((sAfter, evs)) => gameState = sAfter; handleEvents(evs)
+              case Left(_) =>
+            }
           }
       }
     }

@@ -14,6 +14,8 @@ libraryDependencies ++= Seq(
 )
 javaOptions += "--add-opens=java.base/java.lang=ALL-UNNAMED"
 
+libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0"
+
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(

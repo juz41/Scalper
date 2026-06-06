@@ -14,6 +14,10 @@ import javax.swing.border._
 import javax.swing.event.ChangeListener
 import javax.swing.text._
 
+import scala.collection.immutable.List
+
+import upickle.default._
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //  PALETTE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -124,176 +128,6 @@ class State {
     seats.find(s => s.occupied && s.name == name).foreach { s =>
       s.occupied = false; s.name = ""; s.hand = Nil; s.backCards = 0
     }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-//  MESSAGE PARSER
-//  Understands both English (server-side) and Polish log text
-// ═══════════════════════════════════════════════════════════════════════════════
-object Parser {
-  // Pot / chips
-  val potRe      = """(?i)pot\s*[:\-]\s*(\d+)""".r
-  val chipsRe    = """(?i)^\s*(.+?):\s*(\d+)\s+chips""".r
-  val callRe     = """(?i)to-call\s*[:\-]\s*(\d+)""".r
-  val minRaiseRe = """(?i)min\s*[:\-]\s*(\d+)""".r
-  val myChipsRe  = """(?i)chips[:\-]\s*(\d+)""".r
-
-  // Cards
-  val myCardRe = """(?i)(?:your\s+(?:hole\s+)?cards?|hand)\s*[:\-]\s*(.+)""".r
-  val tableRe  = """(?i)(?:community|board|flop|turn|river|table)\s*[:\-]\s*(.+)""".r
-
-  // Showdown reveal – "PlayerName: A♠ K♥"  or  "[PlayerName] shows A♠ K♥"
-  val showRe   = """(?i)(?:\[([^\]]+)\]|^\s*(.+?))\s*(?:shows?|:)\s+([2-9TJQKA10]+[\u2660\u2665\u2666\u2663].*)""".r
-
-  // Players
-  val joinRe    = """(?i)\*{2,}\s*(.+?)\s+joined""".r
-  val leftRe    = """(?i)\[([^\]]+)\]\s*(?:left|disconnected)""".r
-  val sessionRe = """(?i)SESSION[^:]*[:\-]\s*([A-Z0-9]{4})""".r
-
-  // Actions
-  val foldRe    = """(?i)^\s*(.+?)\s+folds?""".r
-  val raiseRe   = """(?i)^\s*(.+?)\s+raises?\s+to\s+(\d+)\s*\(added\s+(\d+)\)""".r
-  val callAmtRe = """(?i)^\s*(.+?)\s+calls?\s+(\d+)""".r
-  val checkRe   = """(?i)^\s*(.+?)\s+checks?""".r
-  val activeRe  = """(?i)\[([^\]]+)\]\s+(?:it's your turn|action|your turn)""".r
-  val dealerRe  = """(?i)Dealer:\s*(.+)""".r
-
-  val newRoundRe = """(?i)(?:new\s+(?:round|hand)|hand\s*#|blinds:)""".r
-  val streetRe   = """(?i)──\s*(?:flop|turn|river)\s*──""".r
-  val winRe      = """(?i)(?:wins?|winner)""".r
-
-  def process(msg: String, st: State): Unit = {
-    joinRe.findFirstMatchIn(msg).foreach { m =>
-      val name = m.group(1).trim
-      st.addPlayer(name)
-      st.lastJoinedName = name
-    }
-
-    sessionRe.findFirstMatchIn(msg).foreach { m =>
-      st.sessionCode = m.group(1)
-      st.inLobby = true
-      if (st.localName.isEmpty && st.lastJoinedName.nonEmpty) {
-        st.localName = st.lastJoinedName
-        st.seats.find(_.name == st.localName).foreach { s =>
-          s.isLocal = true
-          s.backCards = 0
-        }
-      }
-    }
-
-    if (newRoundRe.findFirstIn(msg).isDefined) {
-      st.fullReset(); st.round = "Pre-Flop"
-    }
-
-    potRe.findFirstMatchIn(msg).foreach(m => st.pot = m.group(1).toInt)
-    chipsRe.findFirstMatchIn(msg).foreach { m =>
-      val name = m.group(1).trim
-      val chips = m.group(2).toInt
-      st.addPlayer(name)
-      st.seats.find(_.name == name).foreach(_.chips = chips)
-      if (name == st.localName) st.myChips = chips
-    }
-    callRe.findFirstMatchIn(msg).foreach(m => st.callAmount = m.group(1).toInt)
-    minRaiseRe.findFirstMatchIn(msg).foreach(m => st.minRaise = m.group(1).toInt)
-
-    // Local player's hole cards
-    myCardRe.findFirstMatchIn(msg).foreach { m =>
-      val c = Card.allIn(m.group(1))
-      if (c.nonEmpty) {
-        st.myHand = c
-        st.localSeat.foreach { s => s.hand = c; s.backCards = 0 }
-      }
-    }
-
-    // Community / board cards
-    tableRe.findFirstMatchIn(msg).foreach { m =>
-      val c = Card.allIn(m.group(1))
-      if (c.nonEmpty) {
-        st.community = c
-        val lo = msg.toLowerCase
-        if (lo.contains("flop"))  st.round = "Flop"
-        if (lo.contains("turn"))  st.round = "Turn"
-        if (lo.contains("river")) st.round = "River"
-      }
-    }
-
-    // Showdown card reveal for opponents
-    showRe.findAllMatchIn(msg).foreach { m =>
-      val name  = Option(m.group(1)).orElse(Option(m.group(2))).getOrElse("").trim
-      val cards = Card.allIn(m.group(3))
-      if (cards.nonEmpty && name.nonEmpty) {
-        st.seats.find(s => s.occupied && s.name.equalsIgnoreCase(name)).foreach { s =>
-          s.hand = cards; s.backCards = 0
-        }
-      }
-    }
-
-    leftRe.findFirstMatchIn(msg).foreach(m => st.removePlayer(m.group(1).trim))
-
-    // Reset bets on new street
-    if (streetRe.findFirstIn(msg).isDefined) st.streetReset()
-
-    foldRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.find(_.name == m.group(1)).foreach { s =>
-        s.folded = true; s.active = false; s.backCards = 0; s.hand = Nil; s.bet = 0
-      }
-    }
-
-    raiseRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.find(_.name == m.group(1)).foreach { s =>
-        val total = m.group(2).toInt
-        val added = m.group(3).toInt
-        s.bet = total; s.active = false; s.chips -= added
-        st.currentStreetBet = total
-      }
-    }
-
-    callAmtRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.find(_.name == m.group(1)).foreach { s =>
-        val added = m.group(2).toInt
-        s.bet = st.currentStreetBet; s.active = false; s.chips -= added
-      }
-    }
-
-    checkRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.find(_.name == m.group(1)).foreach { s =>
-        s.active = false
-      }
-    }
-
-    activeRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.foreach(_.active = false)
-      st.seats.find(_.name == m.group(1)).foreach(_.active = true)
-    }
-
-    dealerRe.findFirstMatchIn(msg).foreach { m =>
-      st.seats.foreach(_.isDealer = false)
-      st.seats.find(_.name == m.group(1)).foreach(_.isDealer = true)
-    }
-
-    // Lobby / game state transitions
-    val lo = msg.toLowerCase
-    if (lo.contains("lobby")) st.inLobby = true
-    if (lo.contains("starting") || lo.contains("start game") || lo.contains("round") ||
-      newRoundRe.findFirstIn(msg).isDefined)                  st.inLobby = false
-    if (winRe.findFirstIn(msg).isDefined)                        st.round   = "Showdown"
-  }
-
-  def isActionPrompt(p: String): Boolean = {
-    val lo = p.toLowerCase
-    lo.contains("fold") || lo.contains("call") || lo.contains("raise") || lo.contains("check") ||
-      lo.contains("action")
-  }
-  def isMenuPrompt(p: String): Boolean =
-    p.contains("1") && p.contains("2") &&
-      (p.toLowerCase.contains("choose") || p.toLowerCase.contains("select") ||
-        p.toLowerCase.contains("menu"))
-  def isNamePrompt(p: String): Boolean = {
-    val lo = p.toLowerCase; lo.contains("name")
-  }
-  def isCodePrompt(p: String): Boolean = {
-    val lo = p.toLowerCase; lo.contains("code")
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -741,7 +575,7 @@ class RBtn(label: String, initialBg: Color, w: Int = 0, h: Int = 34) extends JBu
 //  ADAPTIVE INPUT PANEL
 //  Switches layout based on what the server is asking for
 // ═══════════════════════════════════════════════════════════════════════════════
-class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
+class InputPanel(rawSend: ClientToServer => Unit) extends JPanel(new BorderLayout()) {
   setBackground(K.PANEL)
 
   // ── Prompt strip ──────────────────────────────────────────────────────────
@@ -799,8 +633,8 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   // 4. Main menu
   private val newBtn  = new RBtn("\uD83C\uDFB2  New Game",      K.GREEN, 148)
   private val joinBtn = new RBtn("\uD83D\uDD17  Join Game",      K.BLUE,  148)
-  newBtn.addActionListener  (_ => { rawSend("1"); cl.show(deck, "chat") })
-  joinBtn.addActionListener (_ => { rawSend("2"); cl.show(deck, "chat") })
+  newBtn.addActionListener  (_ => { rawSend(ClientToServer.ChatInput("1")); cl.show(deck, "chat") })
+  joinBtn.addActionListener (_ => { rawSend(ClientToServer.ChatInput("2")); cl.show(deck, "chat") })
   private val menuRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 12)) {
     setBackground(K.PANEL); add(newBtn); add(joinBtn)
   }
@@ -810,13 +644,13 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   private val startBtn = new RBtn("/start \u25ba",  K.GREEN, 112)
   private val botBtn   = new RBtn("+ Bot \uD83E\uDD16", K.BLUE,  112)
   private val leaveBtn = new RBtn("Leave \u2716",   K.RED,   112)
-  startBtn.addActionListener(_ => rawSend("/start"))
-  botBtn.addActionListener(_   => rawSend("/bot"))
-  leaveBtn.addActionListener(_ => rawSend("/leave"))
+  startBtn.addActionListener(_ => rawSend(ClientToServer.LobbyCmd("/start")))
+  botBtn.addActionListener(_   => rawSend(ClientToServer.LobbyCmd("/bot")))
+  leaveBtn.addActionListener(_ => rawSend(ClientToServer.LobbyCmd("/leave")))
   private val lchat = mkField("Chat…"); lchat.setPreferredSize(new Dimension(170, 34))
   private val lsend = new RBtn("Chat \u25ba", new Color(48, 60, 76), 88)
-  lsend.addActionListener(_ => { val t = lchat.getText.trim; if (t.nonEmpty) { rawSend(t); lchat.setText("") } })
-  lchat.addActionListener(_ => { val t = lchat.getText.trim; if (t.nonEmpty) { rawSend(t); lchat.setText("") } })
+  lsend.addActionListener(_ => { val t = lchat.getText.trim; if (t.nonEmpty) { rawSend(ClientToServer.ChatInput(t)); lchat.setText("") } })
+  lchat.addActionListener(_ => { val t = lchat.getText.trim; if (t.nonEmpty) { rawSend(ClientToServer.ChatInput(t)); lchat.setText("") } })
   private val lobbyRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 9)) {
     setBackground(K.PANEL)
     setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6))
@@ -841,7 +675,6 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   private val raiseBtn = new RBtn("Raise (R)", K.YELLOW, 106)
   raiseBtn.setForeground(new Color(26, 20, 4))
 
-  // Bidirectional sync: slider <-> text field
   private var _sliderSync = false
   raiseSlider.addChangeListener((_: javax.swing.event.ChangeEvent) => if (!_sliderSync) {
     _sliderSync = true; raiseFld.setText(raiseSlider.getValue.toString); _sliderSync = false
@@ -857,10 +690,11 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
     override def changedUpdate(e: javax.swing.event.DocumentEvent): Unit = sync()
   })
 
-  foldBtn.addActionListener(_  => act("f"))
-  checkCallBtn.addActionListener(_ => act("c"))
-  raiseBtn.addActionListener(_ => act("r " + raiseFld.getText.trim))
-  raiseFld.addActionListener(_ => act("r " + raiseFld.getText.trim))
+  // JAWNE WSKAZANIE NA engine.Action NAPRAWIA BŁĄD Z javax.swing.Action!
+  foldBtn.addActionListener(_  => act(engine.Action.Fold))
+  checkCallBtn.addActionListener(_ => act(engine.Action.Call))
+  raiseBtn.addActionListener(_ => act(engine.Action.Raise(raiseFld.getText.trim.toIntOption.getOrElse(0))))
+  raiseFld.addActionListener(_ => act(engine.Action.Raise(raiseFld.getText.trim.toIntOption.getOrElse(0))))
 
   private val actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 9)) {
     setBackground(K.PANEL)
@@ -881,52 +715,40 @@ class InputPanel(rawSend: String => Unit) extends JPanel(new BorderLayout()) {
   add(bottom, BorderLayout.CENTER)
 
   // ── Public API ────────────────────────────────────────────────────────────
+  // ZASTĄPIENIE STAREGO PARSERA ZWYKŁYMI STRINGAMI
   def onPrompt(p: String): Unit = SwingUtilities.invokeLater(() => {
     promptLabel.setText(p); promptBar.setVisible(true)
-    if      (Parser.isNamePrompt(p))   { cl.show(deck, "name");   nameFld.requestFocusInWindow() }
-    else if (Parser.isCodePrompt(p))   { cl.show(deck, "code");   codeFld.requestFocusInWindow() }
-    else if (Parser.isMenuPrompt(p))   { cl.show(deck, "menu") }
-    else if (Parser.isActionPrompt(p)) { cl.show(deck, "action"); raiseFld.requestFocusInWindow() }
-    else                               { cl.show(deck, "chat");   chatFld.requestFocusInWindow() }
+    val lo = p.toLowerCase
+    if      (lo.contains("name"))     { cl.show(deck, "name");   nameFld.requestFocusInWindow() }
+    else if (lo.contains("code"))     { cl.show(deck, "code");   codeFld.requestFocusInWindow() }
+    else if (lo.contains("choose") || lo.contains("select") || lo.contains("menu")) { cl.show(deck, "menu") }
+    else if (lo.contains("turn") || lo.contains("fold") || lo.contains("raise")) { cl.show(deck, "action"); raiseFld.requestFocusInWindow() }
+    else                              { cl.show(deck, "chat"); chatFld.requestFocusInWindow() }
   })
 
-  def showLobby(): Unit = SwingUtilities.invokeLater(() => {
-    promptBar.setVisible(false)
-    cl.show(deck, "lobby")
-  })
-  def showGame(): Unit = SwingUtilities.invokeLater(() => {
-    cl.show(deck, "chat")
-  })
+  def showLobby(): Unit = SwingUtilities.invokeLater(() => { promptBar.setVisible(false); cl.show(deck, "lobby") })
+  def showGame(): Unit = SwingUtilities.invokeLater(() => { cl.show(deck, "chat") })
   def hidePrompt(): Unit = SwingUtilities.invokeLater(() => promptBar.setVisible(false))
 
-  def syncHand(hand: Seq[Card], chips: Int): Unit = SwingUtilities.invokeLater(() => {
-    _hand = hand; _chips = chips; handPanel.repaint()
-  })
+  def syncHand(hand: Seq[Card], chips: Int): Unit = SwingUtilities.invokeLater(() => { _hand = hand; _chips = chips; handPanel.repaint() })
   def syncCallAmount(n: Int): Unit = SwingUtilities.invokeLater(() => {
-    if (n > 0) {
-      checkCallBtn.setText(s"Call $n (C)")
-      checkCallBtn.setBackground(K.GREEN)
-    } else {
-      checkCallBtn.setText("Check (C)")
-      checkCallBtn.setBackground(K.BLUE)
-    }
+    if (n > 0) { checkCallBtn.setText(s"Call $n (C)"); checkCallBtn.setBackground(K.GREEN) }
+    else       { checkCallBtn.setText("Check (C)"); checkCallBtn.setBackground(K.BLUE) }
   })
-  def syncMinRaise(n: Int): Unit = SwingUtilities.invokeLater(() =>
-    if (n > 0) { raiseSlider.setMinimum(n); raiseFld.setText(n.toString) })
-
-  def syncAvailableChips(n: Int): Unit = SwingUtilities.invokeLater(() =>
-    if (n > 0) raiseSlider.setMaximum(n))
+  def syncMinRaise(n: Int): Unit = SwingUtilities.invokeLater(() => if (n > 0) { raiseSlider.setMinimum(n); raiseFld.setText(n.toString) })
+  def syncAvailableChips(n: Int): Unit = SwingUtilities.invokeLater(() => if (n > 0) raiseSlider.setMaximum(n))
 
   // ── Private helpers ───────────────────────────────────────────────────────
-  private def act(cmd: String): Unit = {
-    rawSend(cmd); promptBar.setVisible(false); cl.show(deck, "chat")
+  private def act(cmd: engine.Action): Unit = {
+    rawSend(ClientToServer.PlayerAct(cmd))
+    promptBar.setVisible(false); cl.show(deck, "chat")
   }
   private def doGeneric(f: JTextField): Unit = {
-    val t = f.getText.trim; if (t.nonEmpty) rawSend(t); f.setText("")
+    val t = f.getText.trim; if (t.nonEmpty) rawSend(ClientToServer.ChatInput(t)); f.setText("")
     promptBar.setVisible(false); cl.show(deck, "chat")
   }
   private def doChat(): Unit = {
-    val t = chatFld.getText.trim; if (t.nonEmpty) { rawSend(t); chatFld.setText("") }
+    val t = chatFld.getText.trim; if (t.nonEmpty) { rawSend(ClientToServer.ChatInput(t)); chatFld.setText("") }
   }
   private def mkField(hint: String = ""): JTextField = new JTextField() {
     setFont(K.F_BODY); setBackground(K.INPUT_BG); setForeground(K.WHITE)
@@ -1072,9 +894,9 @@ object PekkoClientUI {
     val table  = new TablePanel(st)
     val log    = new LogPanel
     val header = new HeaderBar
-    var sendFn: String => Unit = _ => ()
+    var sendFn: ClientToServer => Unit = _ => ()
 
-    val input = new InputPanel((msg: String) => sendFn(msg))
+    val input = new InputPanel((msg: ClientToServer) => sendFn(msg))
 
     val split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table, log) {
       setDividerLocation(800); setResizeWeight(1.0)
@@ -1094,7 +916,7 @@ object PekkoClientUI {
     var connectScreen: ConnectScreen = null
     connectScreen = new ConnectScreen((host: String, port: Int) =>
       connectWS(host, port, st, table, log, input, header,
-        onReady = (fn: String => Unit) => {
+        onReady = (fn: ClientToServer => Unit) => {
           sendFn = fn
           SwingUtilities.invokeLater(() => {
             rootLayout.show(root, "game")
@@ -1124,58 +946,115 @@ object PekkoClientUI {
                          log:     LogPanel,
                          input:   InputPanel,
                          header:  HeaderBar,
-                         onReady: (String => Unit) => Unit,
+                         onReady: (ClientToServer => Unit) => Unit,
                          onError: String => Unit,
                          onClose: () => Unit
                        ): Unit = {
     implicit val sys: ActorSystem[Nothing] = system
     import sys.executionContext
 
+    var awaitingAction = false
+
     val (queue, source) =
       Source.queue[Message](256, OverflowStrategy.dropTail).preMaterialize()
 
-    val rawSend: String => Unit = (text: String) => { queue.offer(TextMessage(s"INPUT:$text")); () }
+    val rawSend: ClientToServer => Unit = (msg: ClientToServer) => {
+      awaitingAction = false
+      queue.offer(TextMessage(write(msg)))
+      ()
+    }
 
     val sink = Sink.foreach[Message] {
-      case TextMessage.Strict(raw) if raw.startsWith("MSG:") =>
-        val rawMsg = raw.drop(4)
-        val msg = """\b([2-9TJQKA]|10)([HDCS])\b""".r.replaceAllIn(rawMsg, m => {
-          val suit = m.group(2) match {
-            case "H" => "\u2665"
-            case "D" => "\u2666"
-            case "C" => "\u2663"
-            case "S" => "\u2660"
-            case other => other
+      case TextMessage.Strict(raw) =>
+        try {
+          val serverMsg = read[ServerToClient](raw)
+
+          def toUICards(cards: List[model.Card]): Seq[Card] = cards.map { c =>
+            val suitSymbol = c.suit match {
+              case model.Suit.Hearts   => "\u2665"
+              case model.Suit.Diamonds => "\u2666"
+              case model.Suit.Clubs    => "\u2663"
+              case model.Suit.Spades   => "\u2660"
+            }
+            Card(c.rank.name, suitSymbol)
           }
-          m.group(1) + suit
-        })
-        log.addMsg(msg)
-        Parser.process(msg, st)
-        println(s"[DEBUG] msg='$msg' chips=${st.myChips} inLobby=${st.inLobby} seats=${st.seats.count(_.occupied)}")
-        // Keep header session badge up to date
-        if (st.sessionCode.nonEmpty) header.setSession(st.sessionCode)
 
-        st.localSeat.foreach { s =>
-          s.hand = st.myHand
-          // Sync chips FROM seat (parser may have subtracted bets) — only overwrite if round-start reset it
-          if (st.myChips != s.chips && s.chips >= 0) st.myChips = s.chips
-        }
+          serverMsg match {
+            case ServerToClient.GameLog(msg, isChat) =>
+              log.addMsg(if(isChat) s"[Chat] $msg" else msg)
 
-        input.syncHand(st.myHand, st.myChips)
-        input.syncCallAmount(st.callAmount)
-        input.syncMinRaise(st.minRaise)
+            case ServerToClient.SyncState(pot, round, comm, bet) =>
+              st.pot = pot
+              st.round = round
+              st.community = toUICards(comm)
+              st.currentStreetBet = bet
+              if (round == "Pre-Flop") {
+                st.seats.foreach(s => { s.bet = 0; s.folded = false })
+                st.community = Nil
+              }
 
-        if (st.inLobby) input.showLobby() else input.showGame()
-        table.refresh()
+            case ServerToClient.SyncPlayer(name, chips, folded, bet, active) =>
+              st.addPlayer(name)
+              st.seats.find(_.name == name).foreach { s =>
+                if (chips >= 0) s.chips = chips
+                s.folded = folded
+                if (bet >= 0) s.bet = bet
+                s.active = active
+                if (folded) { s.backCards = 0; s.hand = Nil }
+              }
+              if (name == st.localName && chips >= 0) st.myChips = chips
 
-      case TextMessage.Strict(raw) if raw.startsWith("PROMPT:") =>
-        val p = raw.drop(7)
-        Parser.process(p, st)
-        input.syncCallAmount(st.callAmount)
-        input.syncMinRaise(st.minRaise)
-        Parser.myChipsRe.findFirstMatchIn(p).foreach(m => input.syncAvailableChips(m.group(1).toInt))
-        input.onPrompt(p)
+            case ServerToClient.HoleCards(cards) =>
+              val uiCards = toUICards(cards)
+              st.myHand = uiCards
+              st.localSeat.foreach { s => s.hand = uiCards; s.backCards = 0 }
 
+            case ServerToClient.ShowdownCards(name, cards) =>
+              st.seats.find(_.name == name).foreach { s => s.hand = toUICards(cards); s.backCards = 0 }
+
+            case ServerToClient.PlayerJoined(name) =>
+              st.addPlayer(name)
+              log.addMsg(s"*** $name joined room ***")
+              if (st.localName.isEmpty) {
+                st.localName = name
+                st.seats.find(_.name == name).foreach { s => s.isLocal = true; s.backCards = 0 }
+              }
+
+            case ServerToClient.PlayerLeft(name) =>
+              st.removePlayer(name)
+              log.addMsg(s"*** $name left the room ***")
+
+            case ServerToClient.SessionInfo(code) =>
+              st.sessionCode = code
+              st.inLobby = true
+              header.setSession(code)
+
+            case ServerToClient.LobbyState(inLobby) =>
+              st.inLobby = inLobby
+
+            case ServerToClient.PromptAction(callAmount, minRaise, chips) =>
+              st.callAmount = callAmount
+              st.minRaise = minRaise
+              input.syncCallAmount(callAmount)
+              input.syncMinRaise(minRaise)
+              input.syncAvailableChips(chips)
+              awaitingAction = true
+              input.onPrompt("Your turn! Fold, Call, or Raise?")
+
+            case ServerToClient.PromptMenu(text) =>
+              input.onPrompt(text)
+          }
+
+          input.syncHand(st.myHand, st.myChips)
+          if (st.sessionCode.nonEmpty) {
+            if (st.inLobby)
+              input.showLobby()
+            else if (!awaitingAction)
+              input.showGame()
+          }
+          table.refresh()
+
+        } catch { case e: Exception => println(s"Failed to decode WS JSON: ${e.getMessage}") }
       case _ =>
     }
 

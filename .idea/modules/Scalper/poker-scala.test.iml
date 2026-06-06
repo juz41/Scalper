@@ -34,6 +34,7 @@
     <orderEntry type="library" name="sbt: org.apache.pekko:pekko-serialization-jackson_2.13:1.0.2:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.pekko:pekko-http_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.pekko:pekko-http-spray-json_2.13:1.0.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:upickle_2.13:3.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.13:2.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play_2.13:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: junit:junit:4.13.2:jar" level="project" />
@@ -86,6 +87,9 @@
     <orderEntry type="library" name="sbt: org.lz4:lz4-java:1.8.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.pekko:pekko-http-core_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: io.spray:spray-json_2.13:1.3.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:ujson_2.13:3.1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:upack_2.13:3.1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:upickle-implicits_2.13:3.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-build-link:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-configuration_2.13:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.slf4j:jul-to-slf4j:2.0.13:jar" level="project" />
@@ -149,6 +153,7 @@
     <orderEntry type="library" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.pekko:pekko-parsing_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.parboiled:parboiled_2.13:2.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:upickle-core_2.13:3.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-exceptions:2.9.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_2.13:1.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.play:play-functional_2.13:2.10.6:jar" level="project" />
@@ -187,6 +192,7 @@
     <orderEntry type="library" name="sbt: net.bytebuddy:byte-buddy-agent:1.12.19:jar" level="project" />
     <orderEntry type="library" name="sbt: org.objenesis:objenesis:3.3:jar" level="project" />
     <orderEntry type="library" name="sbt: org.seleniumhq.selenium:selenium-chromium-driver:4.15.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:geny_2.13:1.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: io.opentelemetry:opentelemetry-sdk-metrics:1.28.0:jar" level="project" />
     <orderEntry type="library" name="sbt: io.opentelemetry:opentelemetry-sdk-logs:1.28.0:jar" level="project" />
     <orderEntry type="library" name="sbt: io.opentelemetry:opentelemetry-api-events:1.28.0-alpha:jar" level="project" />
